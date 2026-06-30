@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "FlowOS",
+    "slug": "flowos-mobile",
+    "scheme": "flowos",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.flowos.app"
+    },
+    "android": {
+      "package": "com.flowos.app"
+    },
+    "plugins": ["expo-router"]
+  }
+}
