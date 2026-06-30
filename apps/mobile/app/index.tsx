@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
+import { Link } from "expo-router";
 import { colors, spacing, typography, Button } from "@flowos/ui-shared";
 
 export default function HomeScreen() {
@@ -10,6 +11,9 @@ export default function HomeScreen() {
         is wired up correctly.
       </Text>
       <Button label="Rebuild day" onPress={() => console.log("tapped")} />
+      <Link href="/timeline" asChild>
+        <Button label="View Today's Timeline" />
+      </Link>
     </View>
   );
 }

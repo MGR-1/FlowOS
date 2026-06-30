@@ -5,18 +5,11 @@
   "engines": {
     "node": "20.x"
   },
-  "packageManager": "pnpm@9.0.0",
+  "packageManager": "pnpm@11.9.0",
   "scripts": {
     "build": "pnpm -r build",
     "dev:mobile": "pnpm --filter mobile start",
     "dev:desktop": "pnpm --filter desktop tauri dev",
     "test": "pnpm -r test"
-  },
-  "pnpm": {
-    "overrides": {
-      "react": "19.1.0",
-      "react-native": "0.81.5",
-      "@types/react": "~19.1.10"
-    }
   }
 }
