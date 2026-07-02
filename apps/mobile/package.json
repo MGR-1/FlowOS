@@ -10,19 +10,18 @@
     "test": "echo \"no tests yet\""
   },
   "dependencies": {
-    "@expo/metro-runtime": "~6.1.2",
     "@flowos/core": "workspace:*",
     "@flowos/ui-shared": "workspace:*",
     "expo": "~54.0.0",
-    "expo-linking": "~8.0.12",
     "expo-router": "~6.0.0",
-    "react": "19.1.0",
-    "react-native": "0.81.5",
+    "react": "18.3.1",
+    "react-native": "0.81.4",
     "react-native-safe-area-context": "5.6.1",
-    "react-native-screens": "~4.16.0"
+    "react-native-screens": "~4.16.0",
+    "whatwg-fetch": "^3.6.20"
   },
   "devDependencies": {
-    "@types/react": "~19.1.17",
+    "@types/react": "~18.3.12",
     "typescript": "^5.4.0"
   }
 }

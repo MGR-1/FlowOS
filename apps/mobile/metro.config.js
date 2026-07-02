@@ -15,8 +15,9 @@ config.resolver.nodeModulesPaths = [
   path.resolve(workspaceRoot, "node_modules"),
 ];
 
-// CRITICAL for pnpm monorepos: force a single resolution tree so packages
-// like @flowos/ui-shared can't pull in their own nested copy of react-native
-config.resolver.disableHierarchicalLookup = true;
+// Single react/react-native version is now enforced via pnpm-workspace.yaml
+// overrides, so we don't need to disable hierarchical lookup anymore —
+// doing so was blocking Metro from finding legitimately hoisted packages
+// (like @expo/metro-runtime) when resolving from inside nested .pnpm folders.
 
 module.exports = config;
