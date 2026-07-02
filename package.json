@@ -11,5 +11,8 @@
     "dev:mobile": "pnpm --filter mobile start",
     "dev:desktop": "pnpm --filter desktop tauri dev",
     "test": "pnpm -r test"
+  },
+  "devDependencies": {
+    "supabase": "^2.108.0"
   }
 }
