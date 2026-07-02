@@ -199,24 +199,24 @@ export function scoreUrgencyIndex(scores: number[]): UrgencyResult {
 
   const profileData: Record<
     UrgencyProfile,
-    { label: string; description: string; recommendation: string }
+    { profileLabel: string; description: string; recommendation: string }
   > = {
     prioritizer: {
-      label: "Prioritizer",
+      profileLabel: "Prioritizer",
       description:
         "You have strong clarity on what matters and protect your time accordingly. You spend most of your energy on important work, not reactive firefighting.",
       recommendation:
         "Keep your Investment Block discipline strong. Your next lever is delegation — identifying which Q3 tasks you can stop accepting entirely.",
     },
     strong_urgency_mindset: {
-      label: "Strong urgency mindset",
+      profileLabel: "Strong urgency mindset",
       description:
         "You get important work done, but urgency regularly pulls you off course. You say yes more than you should and feel the cost of it by Friday.",
       recommendation:
         "Start each day by confirming your MIT before opening any messages. Practice a 10-minute pause before accepting any unplanned task.",
     },
     urgency_addiction: {
-      label: "Urgency addiction",
+      profileLabel: "Urgency addiction",
       description:
         "The urgent has crowded out the important. You feel perpetually busy but rarely feel genuine progress. This is the most common pattern among high performers — and the most costly.",
       recommendation:
