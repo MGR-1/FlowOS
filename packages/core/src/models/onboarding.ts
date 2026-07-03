@@ -116,9 +116,7 @@ export function detectChronotype(answers: ChronotypeName[]): ChronotypeName {
   answers.forEach((a) => counts[a]++);
   const maxCount = Math.max(...Object.values(counts));
   // Among tied winners, pick by tie-break order
-  return (
-    TIE_BREAK_ORDER.find((t) => counts[t] === maxCount) ?? "bear"
-  );
+  return TIE_BREAK_ORDER.find((t) => counts[t] === maxCount) ?? "bear";
 }
 
 // --- Profile Template (Step 2) ---
@@ -216,7 +214,8 @@ export const PROFILE_TEMPLATES: ProfileTemplateOption[] = [
   {
     value: "chaos",
     label: "Not sure where to start? Chaos-mode.",
-    description: "Answer 5 quick questions. FlowOS builds your workspace automatically.",
+    description:
+      "Answer 5 quick questions. FlowOS builds your workspace automatically.",
     roles: [],
     isChaos: true,
   },
@@ -280,25 +279,25 @@ export function scoreUrgencyIndex(scores: number[]): UrgencyResult {
     total <= 25
       ? "prioritizer"
       : total <= 45
-      ? "urgency_mindset"
-      : "urgency_addiction";
+        ? "urgency_mindset"
+        : "urgency_addiction";
 
   const profileData: Record<
     UrgencyProfile,
-    { label: string; description: string }
+    { profileLabel: string; description: string }
   > = {
     prioritizer: {
-      label: "Prioritizer",
+      profileLabel: "Prioritizer",
       description:
         "You keep urgency in its place. FlowOS will show you your Drift Score with a light touch — you rarely need the warning.",
     },
     urgency_mindset: {
-      label: "Strong urgency mindset",
+      profileLabel: "Strong urgency mindset",
       description:
         "Urgency plays a real role in how you work. FlowOS will flag drift earlier and protect your Investment Blocks harder.",
     },
     urgency_addiction: {
-      label: "Urgency addiction",
+      profileLabel: "Urgency addiction",
       description:
         "Urgency is running the show. FlowOS will run the strictest Drift Score threshold, and will surface this pattern in your Weekly Performance Report until it moves.",
     },
