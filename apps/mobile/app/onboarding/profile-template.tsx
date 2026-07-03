@@ -1,0 +1,183 @@
+// apps/mobile/app/onboarding/profile-template.tsx
+// Step 2 of 9 — Profile Template Selection (not skippable)
+
+import { useState } from "react";
+import { ScrollView, View, Text, StyleSheet, Pressable } from "react-native";
+import { router } from "expo-router";
+import { colors, spacing, typography, Button } from "@flowos/ui-shared";
+import {
+  PROFILE_TEMPLATES,
+  type ProfileTemplate,
+} from "@flowos/core";
+
+export default function ProfileTemplateScreen() {
+  const [selected, setSelected] = useState<ProfileTemplate | null>(null);
+
+  function handleContinue() {
+    if (!selected) return;
+    // TODO: store profile template + pre-populated roles to Supabase
+    console.log("Profile template selected:", selected);
+    router.push("/onboarding/chronotype");
+  }
+
+  return (
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <View style={styles.header}>
+        <Text style={styles.stepLabel}>Step 2 of 9</Text>
+        <Text style={styles.heading}>What best describes you?</Text>
+        <Text style={styles.subheading}>
+          FlowOS will pre-populate your workspace with roles and routines that
+          fit your context. You can change everything after setup.
+        </Text>
+      </View>
+
+      <View style={styles.templates}>
+        {PROFILE_TEMPLATES.map((template) => (
+          <Pressable
+            key={template.value}
+            onPress={() => setSelected(template.value)}
+            style={[
+              styles.card,
+              selected === template.value && styles.cardSelected,
+              template.isChaos && styles.cardChaos,
+            ]}
+          >
+            <View style={styles.cardTop}>
+              <Text
+                style={[
+                  styles.cardLabel,
+                  selected === template.value && styles.cardLabelSelected,
+                ]}
+              >
+                {template.label}
+              </Text>
+              {selected === template.value && (
+                <View style={styles.checkDot} />
+              )}
+            </View>
+            <Text style={styles.cardDesc}>{template.description}</Text>
+            {template.roles.length > 0 && (
+              <View style={styles.roleRow}>
+                {template.roles.map((role) => (
+                  <View
+                    key={role.monogram}
+                    style={[
+                      styles.rolePill,
+                      { backgroundColor: role.color + "22" },
+                    ]}
+                  >
+                    <Text
+                      style={[styles.rolePillText, { color: role.color }]}
+                    >
+                      {role.monogram}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            )}
+          </Pressable>
+        ))}
+      </View>
+
+      <Button
+        label="Continue"
+        onPress={handleContinue}
+        variant={selected ? "primary" : "secondary"}
+      />
+      {!selected && (
+        <Text style={styles.hint}>Select a template to continue</Text>
+      )}
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background.primary,
+  },
+  content: {
+    padding: spacing.lg,
+    gap: spacing.xl,
+  },
+  header: {
+    gap: spacing.sm,
+  },
+  stepLabel: {
+    color: colors.text.muted,
+    fontSize: typography.size.xs,
+    fontWeight: typography.weight.medium as any,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  heading: {
+    color: colors.text.primary,
+    fontSize: typography.size.xxl,
+    fontWeight: typography.weight.bold as any,
+  },
+  subheading: {
+    color: colors.text.secondary,
+    fontSize: typography.size.base,
+    lineHeight: typography.size.base * 1.6,
+  },
+  templates: {
+    gap: spacing.sm,
+  },
+  card: {
+    backgroundColor: colors.background.secondary,
+    borderRadius: spacing.sm,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border.default,
+    gap: spacing.sm,
+  },
+  cardSelected: {
+    borderColor: colors.accent.primary,
+    backgroundColor: colors.background.elevated,
+  },
+  cardChaos: {
+    borderStyle: "dashed",
+  },
+  cardTop: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  cardLabel: {
+    color: colors.text.secondary,
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.bold as any,
+  },
+  cardLabelSelected: {
+    color: colors.text.primary,
+  },
+  checkDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: colors.accent.primary,
+  },
+  cardDesc: {
+    color: colors.text.muted,
+    fontSize: typography.size.sm,
+  },
+  roleRow: {
+    flexDirection: "row",
+    gap: spacing.xs,
+    flexWrap: "wrap",
+  },
+  rolePill: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs / 2,
+    borderRadius: spacing.xs,
+  },
+  rolePillText: {
+    fontSize: typography.size.xs,
+    fontWeight: typography.weight.bold as any,
+  },
+  hint: {
+    color: colors.text.muted,
+    fontSize: typography.size.sm,
+    textAlign: "center",
+  },
+});

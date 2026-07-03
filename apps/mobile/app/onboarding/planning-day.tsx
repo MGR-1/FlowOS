@@ -1,23 +1,18 @@
 // apps/mobile/app/onboarding/planning-day.tsx
-// Onboarding step: Planning Day Selection (Section 4.2)
-// Position: after calendar connection (step 5), before import step (step 6)
-// Skippable: NO — needed for report scheduling. Default pre-selected (Friday).
+// Step 7 of 9 — Planning Day Selection (not skippable)
+// Horizontal radio row: Mon Tue Wed Thu Fri Sat Sun, default Friday
 
 import { useState } from "react";
-import { ScrollView, View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import { router } from "expo-router";
-import {
-  colors,
-  spacing,
-  typography,
-  OptionCard,
-  Button,
-} from "@flowos/ui-shared";
+import { colors, spacing, typography, Button } from "@flowos/ui-shared";
 import {
   PLANNING_DAY_LABELS,
   DEFAULT_PLANNING_DAY,
   type PlanningDay,
 } from "@flowos/core";
+
+const DAY_ORDER: PlanningDay[] = [1, 2, 3, 4, 5, 6, 0]; // Mon–Sun
 
 export default function PlanningDayScreen() {
   const [selected, setSelected] = useState<PlanningDay>(DEFAULT_PLANNING_DAY);
@@ -25,49 +20,52 @@ export default function PlanningDayScreen() {
   function handleContinue() {
     // TODO: store to users.planning_day via Supabase
     console.log("Planning day selected:", PLANNING_DAY_LABELS[selected]);
-    // Navigate to Urgency Index (next step)
     router.push("/onboarding/urgency-index");
   }
 
-  const days = Object.entries(PLANNING_DAY_LABELS) as [
-    string,
-    string
-  ][];
-
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-    >
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.header}>
-        <Text style={styles.stepLabel}>Step 6 of 8</Text>
-        <Text style={styles.heading}>Choose your planning day</Text>
+        <Text style={styles.stepLabel}>Step 7 of 9</Text>
+        <Text style={styles.heading}>Your planning day</Text>
         <Text style={styles.subheading}>
-          On this day FlowOS will guide you through your weekly review and
-          generate your Performance Report. Friday is the default — most people
-          prefer to plan the new week before the weekend.
+          FlowOS will prompt your weekly review and generate your Performance
+          Report on this day. Friday is the default — most people plan the
+          new week before the weekend.
         </Text>
       </View>
 
-      <View style={styles.options}>
-        {days.map(([dayNum, label]) => (
-          <OptionCard
-            key={dayNum}
-            label={label}
-            sublabel={
-              Number(dayNum) === DEFAULT_PLANNING_DAY ? "Recommended" : undefined
-            }
-            selected={selected === Number(dayNum)}
-            onPress={() => setSelected(Number(dayNum) as PlanningDay)}
-          />
+      {/* Horizontal day selector */}
+      <View style={styles.dayRow}>
+        {DAY_ORDER.map((day) => (
+          <Pressable
+            key={day}
+            onPress={() => setSelected(day)}
+            style={[
+              styles.dayButton,
+              selected === day && styles.dayButtonSelected,
+            ]}
+          >
+            <Text
+              style={[
+                styles.dayLabel,
+                selected === day && styles.dayLabelSelected,
+              ]}
+            >
+              {PLANNING_DAY_LABELS[day]}
+            </Text>
+          </Pressable>
         ))}
       </View>
 
+      {/* Live confirmation sentence */}
       <View style={styles.confirmBox}>
         <Text style={styles.confirmText}>
           Every{" "}
           <Text style={styles.confirmHighlight}>
-            {PLANNING_DAY_LABELS[selected]}
+            {Object.entries(PLANNING_DAY_LABELS).find(
+              ([k]) => Number(k) === selected
+            )?.[1] ?? "Friday"}
           </Text>
           , FlowOS will prompt your weekly reflection and generate your
           Performance Report.
@@ -108,8 +106,30 @@ const styles = StyleSheet.create({
     fontSize: typography.size.base,
     lineHeight: typography.size.base * 1.6,
   },
-  options: {
-    gap: spacing.sm,
+  dayRow: {
+    flexDirection: "row",
+    gap: spacing.xs,
+  },
+  dayButton: {
+    flex: 1,
+    paddingVertical: spacing.sm,
+    borderRadius: spacing.xs,
+    backgroundColor: colors.background.elevated,
+    borderWidth: 1,
+    borderColor: colors.border.default,
+    alignItems: "center",
+  },
+  dayButtonSelected: {
+    backgroundColor: colors.accent.primary,
+    borderColor: colors.accent.primary,
+  },
+  dayLabel: {
+    color: colors.text.secondary,
+    fontSize: typography.size.xs,
+    fontWeight: typography.weight.medium as any,
+  },
+  dayLabelSelected: {
+    color: colors.text.primary,
   },
   confirmBox: {
     backgroundColor: colors.background.elevated,

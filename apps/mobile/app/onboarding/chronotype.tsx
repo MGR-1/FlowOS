@@ -1,25 +1,11 @@
 // apps/mobile/app/onboarding/chronotype.tsx
-// Onboarding step: Chronotype Assessment (Section 4.2)
-// Position: after profile template selection (step 2), before mission editor (step 3)
-// Skippable: NO — required for auto-pilot scheduling
+// Step 3 of 9 — Chronotype Assessment (not skippable)
+// One question at a time — answering advances immediately
 
 import { useState } from "react";
-import {
-  ScrollView,
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-} from "react-native";
+import { ScrollView, View, Text, StyleSheet, Pressable } from "react-native";
 import { router } from "expo-router";
-import {
-  colors,
-  spacing,
-  typography,
-  OptionCard,
-  RingCard,
-  Button,
-} from "@flowos/ui-shared";
+import { colors, spacing, typography, RingCard, Button } from "@flowos/ui-shared";
 import {
   CHRONOTYPE_QUESTIONS,
   CHRONOTYPE_PROFILES,
@@ -35,48 +21,44 @@ const CHRONOTYPE_ACCENT: Record<ChronotypeName, string> = {
 };
 
 export default function ChronotypeScreen() {
-  const [answers, setAnswers] = useState<(ChronotypeName | null)[]>(
-    Array(CHRONOTYPE_QUESTIONS.length).fill(null)
-  );
+  const [currentQ, setCurrentQ] = useState(0);
+  const [answers, setAnswers] = useState<ChronotypeName[]>([]);
   const [result, setResult] = useState<ChronotypeName | null>(null);
 
-  const allAnswered = answers.every((a) => a !== null);
+  const total = CHRONOTYPE_QUESTIONS.length;
+  const question = CHRONOTYPE_QUESTIONS[currentQ];
 
-  function handleAnswer(questionIndex: number, value: ChronotypeName) {
-    setAnswers((prev) => {
-      const next = [...prev];
-      next[questionIndex] = value;
-      return next;
-    });
-  }
-
-  function handleCalculate() {
-    const detected = detectChronotype(answers as ChronotypeName[]);
-    setResult(detected);
-    // TODO: store to chronotype_profiles.assessed_type via Supabase
-    console.log("Chronotype assessed:", detected);
+  function handleAnswer(value: ChronotypeName) {
+    const newAnswers = [...answers, value];
+    if (currentQ < total - 1) {
+      setAnswers(newAnswers);
+      setCurrentQ((q) => q + 1);
+    } else {
+      const detected = detectChronotype(newAnswers);
+      setAnswers(newAnswers);
+      setResult(detected);
+      // TODO: store to chronotype_profiles.assessed_type via Supabase
+      console.log("Chronotype assessed:", detected);
+    }
   }
 
   function handleContinue() {
-    // Navigate to next onboarding step (mission editor — step 3)
-    // TODO: replace with actual next step route once full wizard is wired
-    router.push("/onboarding/planning-day");
+    router.push("/onboarding/first-week-goal");
   }
 
+  // Result card
   if (result) {
     const profile = CHRONOTYPE_PROFILES[result];
     const accent = CHRONOTYPE_ACCENT[result];
     return (
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={styles.content}
-      >
+      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        <Text style={styles.stepLabel}>Step 3 of 9</Text>
         <Text style={styles.heading}>Your chronotype</Text>
         <RingCard
           title={profile.label}
           subtitle={profile.peakWindow}
           description={profile.description}
-          tip={profile.planningTip}
+          tip="FlowOS will use this to schedule your Investment Blocks in your peak window from day one."
           accentColor={accent}
         />
         <Button label="Continue" onPress={handleContinue} />
@@ -84,47 +66,49 @@ export default function ChronotypeScreen() {
     );
   }
 
+  // One question at a time
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-    >
-      <View style={styles.header}>
-        <Text style={styles.stepLabel}>Step 3 of 8</Text>
+    <View style={styles.container}>
+      <View style={styles.content}>
+        {/* Progress */}
+        <View style={styles.header}>
+          <Text style={styles.stepLabel}>Step 3 of 9</Text>
+          <Text style={styles.progressText}>
+            {currentQ + 1} of {total}
+          </Text>
+        </View>
+        <View style={styles.progressBar}>
+          <View
+            style={[
+              styles.progressFill,
+              { width: `${((currentQ + 1) / total) * 100}%` },
+            ]}
+          />
+        </View>
+
         <Text style={styles.heading}>When do you do your best work?</Text>
-        <Text style={styles.subheading}>
-          Answer honestly — FlowOS uses this to schedule your most demanding
-          tasks in your peak window from day one.
+        <Text style={styles.questionText}>{question.text}</Text>
+
+        <View style={styles.options}>
+          {question.options.map((opt) => (
+            <Pressable
+              key={opt.value}
+              onPress={() => handleAnswer(opt.value)}
+              style={({ pressed }) => [
+                styles.optionButton,
+                pressed && styles.optionButtonPressed,
+              ]}
+            >
+              <Text style={styles.optionLabel}>{opt.label}</Text>
+            </Pressable>
+          ))}
+        </View>
+
+        <Text style={styles.hint}>
+          Tap an answer to continue — answering advances automatically.
         </Text>
       </View>
-
-      {CHRONOTYPE_QUESTIONS.map((question, qi) => (
-        <View key={question.id} style={styles.questionBlock}>
-          <Text style={styles.questionText}>
-            {qi + 1}. {question.text}
-          </Text>
-          <View style={styles.options}>
-            {question.options.map((option) => (
-              <OptionCard
-                key={option.value}
-                label={option.label}
-                selected={answers[qi] === option.value}
-                onPress={() => handleAnswer(qi, option.value)}
-              />
-            ))}
-          </View>
-        </View>
-      ))}
-
-      <Button
-        label="See my chronotype"
-        onPress={handleCalculate}
-        variant={allAnswered ? "primary" : "secondary"}
-      />
-      {!allAnswered && (
-        <Text style={styles.hint}>Answer all 4 questions to continue</Text>
-      )}
-    </ScrollView>
+    </View>
   );
 }
 
@@ -135,10 +119,13 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: spacing.lg,
-    gap: spacing.xl,
+    gap: spacing.lg,
+    flex: 1,
   },
   header: {
-    gap: spacing.sm,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   stepLabel: {
     color: colors.text.muted,
@@ -147,27 +134,50 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     letterSpacing: 0.5,
   },
+  progressText: {
+    color: colors.text.muted,
+    fontSize: typography.size.xs,
+  },
+  progressBar: {
+    height: 4,
+    backgroundColor: colors.background.elevated,
+    borderRadius: 2,
+    overflow: "hidden",
+  },
+  progressFill: {
+    height: 4,
+    backgroundColor: colors.accent.primary,
+    borderRadius: 2,
+  },
   heading: {
     color: colors.text.primary,
-    fontSize: typography.size.xxl,
+    fontSize: typography.size.xl,
     fontWeight: typography.weight.bold as any,
-  },
-  subheading: {
-    color: colors.text.secondary,
-    fontSize: typography.size.base,
-    lineHeight: typography.size.base * 1.6,
-  },
-  questionBlock: {
-    gap: spacing.md,
   },
   questionText: {
     color: colors.text.primary,
-    fontSize: typography.size.base,
+    fontSize: typography.size.lg,
+    lineHeight: typography.size.lg * 1.5,
     fontWeight: typography.weight.medium as any,
-    lineHeight: typography.size.base * 1.5,
   },
   options: {
     gap: spacing.sm,
+  },
+  optionButton: {
+    backgroundColor: colors.background.secondary,
+    borderRadius: spacing.sm,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border.default,
+  },
+  optionButtonPressed: {
+    backgroundColor: colors.background.elevated,
+    borderColor: colors.accent.primary,
+  },
+  optionLabel: {
+    color: colors.text.primary,
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.medium as any,
   },
   hint: {
     color: colors.text.muted,

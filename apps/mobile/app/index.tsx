@@ -1,41 +1,51 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { Link } from "expo-router";
 import { colors, spacing, typography, Button } from "@flowos/ui-shared";
 
 export default function HomeScreen() {
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.scroll} contentContainerStyle={styles.container}>
       <Text style={styles.title}>FlowOS</Text>
-      <Text style={styles.subtitle}>
-        If you can see this styled with the design tokens, @flowos/ui-shared
-        is wired up correctly.
-      </Text>
-      <Button label="Rebuild day" onPress={() => console.log("tapped")} />
+      <Text style={styles.subtitle}>Dev build — tap any screen to preview.</Text>
+
+      <Text style={styles.sectionLabel}>MAIN SCREENS</Text>
       <Link href="/timeline" asChild>
-        <Button label="View Today's Timeline" />
+        <Button label="Day Timeline" />
       </Link>
-      <Text style={styles.sectionLabel}>ONBOARDING SCREENS</Text>
-      <Link href="/onboarding/chronotype" asChild>
-        <Button label="Chronotype Assessment" variant="secondary" />
+
+      <Text style={styles.sectionLabel}>ONBOARDING WIZARD</Text>
+      <Link href="/onboarding" asChild>
+        <Button label="▶ Start full wizard (Step 1)" />
       </Link>
-      <Link href="/onboarding/planning-day" asChild>
-        <Button label="Planning Day Selection" variant="secondary" />
-      </Link>
-      <Link href="/onboarding/urgency-index" asChild>
-        <Button label="Urgency Index" variant="secondary" />
-      </Link>
-    </View>
+
+      <Text style={styles.sectionLabel}>INDIVIDUAL STEPS</Text>
+      {[
+        { href: "/onboarding/profile-template", label: "Step 2 — Profile Template" },
+        { href: "/onboarding/chronotype", label: "Step 3 — Chronotype" },
+        { href: "/onboarding/mission-editor", label: "Step 4 — Mission Editor" },
+        { href: "/onboarding/first-week-goal", label: "Step 5 — First Week Goal" },
+        { href: "/onboarding/calendar-connection", label: "Step 6 — Calendar Connection" },
+        { href: "/onboarding/planning-day", label: "Step 7 — Planning Day" },
+        { href: "/onboarding/import", label: "Step 8 — Import Tasks" },
+        { href: "/onboarding/urgency-index", label: "Step 9 — Urgency Index" },
+      ].map((item) => (
+        <Link key={item.href} href={item.href as any} asChild>
+          <Button label={item.label} variant="secondary" />
+        </Link>
+      ))}
+    </ScrollView>
   );
 }
 
-
 const styles = StyleSheet.create({
-  container: {
+  scroll: {
     flex: 1,
     backgroundColor: colors.background.primary,
+  },
+  container: {
     padding: spacing.lg,
-    justifyContent: "center",
     gap: spacing.md,
+    paddingBottom: spacing.xxl,
   },
   title: {
     color: colors.text.primary,
@@ -45,6 +55,7 @@ const styles = StyleSheet.create({
   subtitle: {
     color: colors.text.secondary,
     fontSize: typography.size.base,
+    marginBottom: spacing.sm,
   },
   sectionLabel: {
     color: colors.text.muted,

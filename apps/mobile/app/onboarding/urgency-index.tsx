@@ -1,84 +1,64 @@
 // apps/mobile/app/onboarding/urgency-index.tsx
-// Onboarding step: Urgency Index (US-059, Section 4.2)
-// Position: after planning day selection — final onboarding step
-// Skippable: YES — user can complete later in Settings > Performance > Urgency Profile
+// Step 9 of 9 — Urgency Index (US-059, skippable, final step)
+// One question at a time. Answering advances automatically.
+// Never=0 · Sometimes=2 · Always=4
 
 import { useState } from "react";
-import {
-  ScrollView,
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-} from "react-native";
+import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import { router } from "expo-router";
-import {
-  colors,
-  spacing,
-  typography,
-  RingCard,
-  Button,
-} from "@flowos/ui-shared";
-import { URGENCY_QUESTIONS, scoreUrgencyIndex } from "@flowos/core";
+import { colors, spacing, typography, RingCard, Button } from "@flowos/ui-shared";
+import { URGENCY_QUESTIONS, scoreUrgencyIndex, type UrgencyProfile } from "@flowos/core";
 
-const SCORE_OPTIONS: { label: string; value: number }[] = [
+const SCORE_OPTIONS = [
   { label: "Never", value: 0 },
   { label: "Sometimes", value: 2 },
   { label: "Always", value: 4 },
 ];
 
-const URGENCY_ACCENT: Record<string, string> = {
+const URGENCY_ACCENT: Record<UrgencyProfile, string> = {
   prioritizer: colors.accent.success,
-  strong_urgency_mindset: colors.accent.warning,
+  urgency_mindset: colors.accent.warning,
   urgency_addiction: colors.accent.danger,
 };
 
 export default function UrgencyIndexScreen() {
-  const [scores, setScores] = useState<(number | null)[]>(
-    Array(URGENCY_QUESTIONS.length).fill(null)
-  );
-  const [result, setResult] = useState<ReturnType<
-    typeof scoreUrgencyIndex
-  > | null>(null);
+  const [currentQ, setCurrentQ] = useState(0);
+  const [scores, setScores] = useState<number[]>([]);
+  const [result, setResult] = useState<ReturnType<typeof scoreUrgencyIndex> | null>(null);
 
-  const allAnswered = scores.every((s) => s !== null);
-  const answeredCount = scores.filter((s) => s !== null).length;
+  const total = URGENCY_QUESTIONS.length;
 
-  function handleScore(questionIndex: number, value: number) {
-    setScores((prev) => {
-      const next = [...prev];
-      next[questionIndex] = value;
-      return next;
-    });
-  }
-
-  function handleCalculate() {
-    const finalScores = scores.map((s) => s ?? 0);
-    const res = scoreUrgencyIndex(finalScores);
-    setResult(res);
-    // TODO: store all 16 scores + total + profile_type to urgency_index_assessments
-    console.log("Urgency Index result:", res);
+  function handleAnswer(value: number) {
+    const newScores = [...scores, value];
+    if (currentQ < total - 1) {
+      setScores(newScores);
+      setCurrentQ((q) => q + 1);
+    } else {
+      const res = scoreUrgencyIndex(newScores);
+      setScores(newScores);
+      setResult(res);
+      // TODO: store all 16 scores + total + profile to urgency_index_assessments
+      console.log("Urgency Index result:", res);
+    }
   }
 
   function handleSkip() {
     // Skippable — nudge shown on Day 3 morning protocol per spec
     console.log("Urgency Index skipped at onboarding");
-    // TODO: navigate to actual next step / complete onboarding
-    router.push("/");
+    router.replace("/");
   }
 
   function handleFinish() {
-    // TODO: navigate to home / complete onboarding
-    router.push("/");
+    // TODO: mark onboarding complete in Supabase
+    router.replace("/");
   }
 
+  // Result card
   if (result) {
     const accent = URGENCY_ACCENT[result.profile];
     return (
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={styles.content}
-      >
+      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        <Text style={styles.stepLabel}>Step 9 of 9</Text>
         <Text style={styles.heading}>Your urgency profile</Text>
         <View style={styles.scoreRow}>
           <Text style={styles.scoreLabel}>Total score</Text>
@@ -88,95 +68,66 @@ export default function UrgencyIndexScreen() {
         </View>
         <RingCard
           title={result.profileLabel}
-          subtitle={
-            result.secondaryLabel
-              ? result.secondaryLabel
-                  .replace("_", " ")
-                  .replace(/\b\w/g, (c) => c.toUpperCase())
-              : `Score: ${result.totalScore}`
-          }
+          subtitle={`Score: ${result.totalScore}`}
           description={result.description}
-          tip={result.recommendation}
+          tip="You can retake this anytime in Settings → Performance → Urgency Profile."
           accentColor={accent}
         />
         <Button label="Finish setup" onPress={handleFinish} />
-        <Text style={styles.retakeNote}>
-          You can retake this assessment anytime in Settings → Performance →
-          Urgency Profile.
-        </Text>
       </ScrollView>
     );
   }
 
+  // One question at a time
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-    >
-      <View style={styles.header}>
-        <Text style={styles.stepLabel}>Final step · Optional</Text>
-        <Text style={styles.heading}>Your urgency profile</Text>
-        <Text style={styles.subheading}>
-          16 questions based on Covey's First Things First. Takes about 2
-          minutes. FlowOS uses this to personalise your planning from day one.
-        </Text>
-      </View>
+    <View style={styles.container}>
+      <View style={styles.content}>
+        <View style={styles.header}>
+          <View style={styles.headerTop}>
+            <Text style={styles.stepLabel}>Step 9 of 9 · Optional</Text>
+            <Pressable onPress={handleSkip}>
+              <Text style={styles.skipText}>Skip</Text>
+            </Pressable>
+          </View>
+          <Text style={styles.progressText}>
+            {currentQ + 1} of {total}
+          </Text>
+        </View>
 
-      <View style={styles.progressRow}>
-        <Text style={styles.progressText}>
-          {answeredCount} of {URGENCY_QUESTIONS.length} answered
-        </Text>
         <View style={styles.progressBar}>
           <View
             style={[
               styles.progressFill,
-              {
-                width: `${(answeredCount / URGENCY_QUESTIONS.length) * 100}%`,
-              },
+              { width: `${((currentQ + 1) / total) * 100}%` },
             ]}
           />
         </View>
-      </View>
 
-      {URGENCY_QUESTIONS.map((question, qi) => (
-        <View key={qi} style={styles.questionBlock}>
-          <Text style={styles.questionText}>
-            {qi + 1}. {question}
-          </Text>
-          <View style={styles.scoreOptions}>
-            {SCORE_OPTIONS.map((opt) => (
-              <Pressable
-                key={opt.value}
-                onPress={() => handleScore(qi, opt.value)}
-                style={[
-                  styles.scoreButton,
-                  scores[qi] === opt.value && styles.scoreButtonSelected,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.scoreButtonText,
-                    scores[qi] === opt.value &&
-                      styles.scoreButtonTextSelected,
-                  ]}
-                >
-                  {opt.label}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
+        <Text style={styles.heading}>Your urgency profile</Text>
+        <Text style={styles.questionText}>
+          {URGENCY_QUESTIONS[currentQ]}
+        </Text>
+
+        <View style={styles.options}>
+          {SCORE_OPTIONS.map((opt) => (
+            <Pressable
+              key={opt.value}
+              onPress={() => handleAnswer(opt.value)}
+              style={({ pressed }) => [
+                styles.optionButton,
+                pressed && styles.optionButtonPressed,
+              ]}
+            >
+              <Text style={styles.optionLabel}>{opt.label}</Text>
+            </Pressable>
+          ))}
         </View>
-      ))}
 
-      <Button
-        label="See my profile"
-        onPress={handleCalculate}
-        variant={allAnswered ? "primary" : "secondary"}
-      />
-      <Pressable onPress={handleSkip} style={styles.skipButton}>
-        <Text style={styles.skipText}>Skip for now — complete later</Text>
-      </Pressable>
-    </ScrollView>
+        <Text style={styles.hint}>
+          Tap an answer to advance — based on Covey's First Things First.
+        </Text>
+      </View>
+    </View>
   );
 }
 
@@ -187,10 +138,16 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: spacing.lg,
-    gap: spacing.xl,
+    gap: spacing.lg,
+    flex: 1,
   },
   header: {
-    gap: spacing.sm,
+    gap: spacing.xs,
+  },
+  headerTop: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   stepLabel: {
     color: colors.text.muted,
@@ -199,22 +156,14 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     letterSpacing: 0.5,
   },
-  heading: {
-    color: colors.text.primary,
-    fontSize: typography.size.xxl,
-    fontWeight: typography.weight.bold as any,
-  },
-  subheading: {
-    color: colors.text.secondary,
-    fontSize: typography.size.base,
-    lineHeight: typography.size.base * 1.6,
-  },
-  progressRow: {
-    gap: spacing.xs,
+  skipText: {
+    color: colors.accent.primary,
+    fontSize: typography.size.sm,
+    fontWeight: typography.weight.medium as any,
   },
   progressText: {
     color: colors.text.muted,
-    fontSize: typography.size.sm,
+    fontSize: typography.size.xs,
   },
   progressBar: {
     height: 4,
@@ -227,46 +176,41 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accent.primary,
     borderRadius: 2,
   },
-  questionBlock: {
-    gap: spacing.md,
+  heading: {
+    color: colors.text.primary,
+    fontSize: typography.size.xl,
+    fontWeight: typography.weight.bold as any,
   },
   questionText: {
     color: colors.text.primary,
-    fontSize: typography.size.base,
-    lineHeight: typography.size.base * 1.5,
+    fontSize: typography.size.lg,
+    lineHeight: typography.size.lg * 1.5,
+    fontWeight: typography.weight.medium as any,
   },
-  scoreOptions: {
-    flexDirection: "row",
+  options: {
     gap: spacing.sm,
   },
-  scoreButton: {
-    flex: 1,
-    paddingVertical: spacing.sm,
-    borderRadius: spacing.xs,
-    backgroundColor: colors.background.elevated,
+  optionButton: {
+    backgroundColor: colors.background.secondary,
+    borderRadius: spacing.sm,
+    padding: spacing.md,
     borderWidth: 1,
     borderColor: colors.border.default,
     alignItems: "center",
   },
-  scoreButtonSelected: {
-    backgroundColor: colors.accent.primary,
+  optionButtonPressed: {
+    backgroundColor: colors.background.elevated,
     borderColor: colors.accent.primary,
   },
-  scoreButtonText: {
-    color: colors.text.secondary,
-    fontSize: typography.size.sm,
+  optionLabel: {
+    color: colors.text.primary,
+    fontSize: typography.size.base,
     fontWeight: typography.weight.medium as any,
   },
-  scoreButtonTextSelected: {
-    color: colors.text.primary,
-  },
-  skipButton: {
-    alignItems: "center",
-    paddingVertical: spacing.sm,
-  },
-  skipText: {
+  hint: {
     color: colors.text.muted,
     fontSize: typography.size.sm,
+    textAlign: "center",
   },
   scoreRow: {
     flexDirection: "row",
@@ -280,10 +224,5 @@ const styles = StyleSheet.create({
   scoreValue: {
     fontSize: typography.size.xl,
     fontWeight: typography.weight.bold as any,
-  },
-  retakeNote: {
-    color: colors.text.muted,
-    fontSize: typography.size.sm,
-    textAlign: "center",
   },
 });

@@ -1,3 +1,6 @@
+// packages/core/src/models/onboarding.ts
+// Source of truth: FlowOS Onboarding Wizard Spec v1.0
+
 // --- Chronotype (Step 3, Addendum §4.2, Breus methodology) ---
 
 export type ChronotypeName = "lion" | "bear" | "wolf" | "dolphin";
