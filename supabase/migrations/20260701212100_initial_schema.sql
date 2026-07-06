@@ -56,22 +56,36 @@ CREATE TABLE workspace_members (
 
 ALTER TABLE workspace_members ENABLE ROW LEVEL SECURITY;
 
+CREATE FUNCTION get_user_workspace_ids()
+RETURNS SETOF uuid
+LANGUAGE sql SECURITY DEFINER SET search_path = public AS $$
+  SELECT workspace_id FROM workspace_members WHERE user_id = auth.uid()
+$$;
+
 CREATE POLICY "Workspace members can view members in same workspace"
   ON workspace_members FOR SELECT
-  USING (
+  USING (workspace_id IN (SELECT get_user_workspace_ids()));
+
+CREATE POLICY "Workspace owners can insert membership"
+  ON workspace_members FOR INSERT
+  WITH CHECK (
     workspace_id IN (
-      SELECT workspace_id FROM workspace_members wm
-      WHERE wm.user_id = auth.uid()
+      SELECT id FROM workspaces WHERE owner_id = auth.uid()
     )
   );
 
-CREATE POLICY "Users can insert own membership"
-  ON workspace_members FOR INSERT
-  WITH CHECK (user_id = auth.uid());
-
-CREATE POLICY "Users can update own membership"
+CREATE POLICY "Workspace owners can update membership"
   ON workspace_members FOR UPDATE
-  USING (user_id = auth.uid());
+  USING (
+    workspace_id IN (
+      SELECT id FROM workspaces WHERE owner_id = auth.uid()
+    )
+  )
+  WITH CHECK (
+    workspace_id IN (
+      SELECT id FROM workspaces WHERE owner_id = auth.uid()
+    )
+  );
 
 CREATE POLICY "Users can delete own membership"
   ON workspace_members FOR DELETE
@@ -87,7 +101,8 @@ CREATE TABLE missions (
   user_id    uuid REFERENCES auth.users NOT NULL,
   text       text NOT NULL,
   updated_at timestamptz DEFAULT now(),
-  created_at timestamptz DEFAULT now()
+  created_at timestamptz DEFAULT now(),
+  UNIQUE (user_id)
 );
 
 ALTER TABLE missions ENABLE ROW LEVEL SECURITY;

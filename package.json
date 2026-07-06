@@ -13,6 +13,6 @@
     "test": "pnpm -r test"
   },
   "devDependencies": {
-    "supabase": "^2.108.0"
+    "supabase": "^2.109.0"
   }
 }
