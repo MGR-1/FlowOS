@@ -12,15 +12,17 @@ import {
   detectChronotype,
   type ChronotypeName,
 } from "@flowos/core";
+import { useWizard } from "./WizardContext";
 
 const CHRONOTYPE_ACCENT: Record<ChronotypeName, string> = {
-  lion: "#F5A623",
+  lion: colors.accent.warning,
   bear: colors.accent.primary,
-  wolf: "#9B59B6",
+  wolf: colors.accent.purple,
   dolphin: colors.accent.success,
 };
 
 export default function ChronotypeScreen() {
+  const { updateWizardState } = useWizard();
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<ChronotypeName[]>([]);
   const [result, setResult] = useState<ChronotypeName | null>(null);
@@ -38,12 +40,18 @@ export default function ChronotypeScreen() {
       setAnswers(newAnswers);
       setResult(detected);
       // TODO: store to chronotype_profiles.assessed_type via Supabase
+      updateWizardState({ chronotype: detected });
       console.log("Chronotype assessed:", detected);
     }
   }
 
   function handleContinue() {
-    router.push("/onboarding/first-week-goal");
+    router.push("/onboarding/mission-editor");
+  }
+
+  function handleBack() {
+    setAnswers((prev) => prev.slice(0, -1));
+    setCurrentQ((q) => Math.max(0, q - 1));
   }
 
   // Result card
@@ -72,7 +80,14 @@ export default function ChronotypeScreen() {
       <View style={styles.content}>
         {/* Progress */}
         <View style={styles.header}>
-          <Text style={styles.stepLabel}>Step 3 of 9</Text>
+          <View style={styles.headerLeft}>
+            {currentQ > 0 && (
+              <Pressable onPress={handleBack} hitSlop={8}>
+                <Text style={styles.backText}>Back</Text>
+              </Pressable>
+            )}
+            <Text style={styles.stepLabel}>Step 3 of 9</Text>
+          </View>
           <Text style={styles.progressText}>
             {currentQ + 1} of {total}
           </Text>
@@ -126,6 +141,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+  },
+  backText: {
+    color: colors.accent.primary,
+    fontSize: typography.size.sm,
+    fontWeight: typography.weight.medium as any,
   },
   stepLabel: {
     color: colors.text.muted,

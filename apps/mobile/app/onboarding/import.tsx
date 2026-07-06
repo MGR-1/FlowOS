@@ -12,7 +12,7 @@ import {
   Pressable,
 } from "react-native";
 import { router } from "expo-router";
-import { colors, spacing, typography, Button, Badge } from "@flowos/ui-shared";
+import { colors, spacing, typography, Button, Badge, OptionCard } from "@flowos/ui-shared";
 
 type ImportMode = "paste" | "manual" | null;
 
@@ -67,22 +67,20 @@ export default function ImportScreen() {
 
       {/* Mode selector */}
       <View style={styles.modeRow}>
-        <Pressable
-          style={[styles.modeButton, mode === "paste" && styles.modeButtonSelected]}
-          onPress={() => setMode("paste")}
-        >
-          <Text style={[styles.modeLabel, mode === "paste" && styles.modeLabelSelected]}>
-            Paste from Notion
-          </Text>
-        </Pressable>
-        <Pressable
-          style={[styles.modeButton, mode === "manual" && styles.modeButtonSelected]}
-          onPress={() => setMode("manual")}
-        >
-          <Text style={[styles.modeLabel, mode === "manual" && styles.modeLabelSelected]}>
-            Type manually
-          </Text>
-        </Pressable>
+        <View style={styles.modeCard}>
+          <OptionCard
+            label="Paste from Notion"
+            selected={mode === "paste"}
+            onPress={() => setMode("paste")}
+          />
+        </View>
+        <View style={styles.modeCard}>
+          <OptionCard
+            label="Type manually"
+            selected={mode === "manual"}
+            onPress={() => setMode("manual")}
+          />
+        </View>
       </View>
 
       {/* Paste mode */}
@@ -175,26 +173,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: spacing.sm,
   },
-  modeButton: {
+  modeCard: {
     flex: 1,
-    paddingVertical: spacing.sm,
-    borderRadius: spacing.xs,
-    backgroundColor: colors.background.elevated,
-    borderWidth: 1,
-    borderColor: colors.border.default,
-    alignItems: "center",
-  },
-  modeButtonSelected: {
-    borderColor: colors.accent.primary,
-    backgroundColor: colors.background.elevated,
-  },
-  modeLabel: {
-    color: colors.text.muted,
-    fontSize: typography.size.sm,
-    fontWeight: typography.weight.medium as any,
-  },
-  modeLabelSelected: {
-    color: colors.accent.primary,
   },
   section: {
     gap: spacing.md,

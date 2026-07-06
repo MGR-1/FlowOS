@@ -4,18 +4,22 @@
 import { useState } from "react";
 import { ScrollView, View, Text, StyleSheet, Pressable } from "react-native";
 import { router } from "expo-router";
-import { colors, spacing, typography, Button } from "@flowos/ui-shared";
+import { colors, spacing, typography, Button, withAlpha } from "@flowos/ui-shared";
 import {
   PROFILE_TEMPLATES,
   type ProfileTemplate,
 } from "@flowos/core";
+import { useWizard } from "./WizardContext";
 
 export default function ProfileTemplateScreen() {
+  const { updateWizardState } = useWizard();
   const [selected, setSelected] = useState<ProfileTemplate | null>(null);
 
   function handleContinue() {
     if (!selected) return;
+    const template = PROFILE_TEMPLATES.find((t) => t.value === selected);
     // TODO: store profile template + pre-populated roles to Supabase
+    updateWizardState({ profileTemplate: selected, roles: template?.roles ?? [] });
     console.log("Profile template selected:", selected);
     router.push("/onboarding/chronotype");
   }
@@ -63,7 +67,7 @@ export default function ProfileTemplateScreen() {
                     key={role.monogram}
                     style={[
                       styles.rolePill,
-                      { backgroundColor: role.color + "22" },
+                      { backgroundColor: withAlpha(role.color, "22") },
                     ]}
                   >
                     <Text

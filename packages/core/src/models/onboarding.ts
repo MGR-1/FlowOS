@@ -1,5 +1,8 @@
 // packages/core/src/models/onboarding.ts
 // Source of truth: FlowOS Onboarding Wizard Spec v1.0
+import { colors } from "@flowos/ui-shared";
+
+const { violet, blue, teal, amber, gray } = colors.role;
 
 // --- Chronotype (Step 3, Addendum §4.2, Breus methodology) ---
 
@@ -150,11 +153,11 @@ export const PROFILE_TEMPLATES: ProfileTemplateOption[] = [
     label: "Founder",
     description: "Multiple projects, no boss, decisions all day.",
     roles: [
-      { monogram: "B", name: "Build", color: "#7C3AED" },
-      { monogram: "G", name: "Grow", color: "#2563EB" },
-      { monogram: "P", name: "Partner", color: "#0D9488" },
-      { monogram: "H", name: "Health", color: "#D97706" },
-      { monogram: "L", name: "Learn", color: "#6B7280" },
+      { monogram: "B", name: "Build", color: violet },
+      { monogram: "G", name: "Grow", color: blue },
+      { monogram: "P", name: "Partner", color: teal },
+      { monogram: "H", name: "Health", color: amber },
+      { monogram: "L", name: "Learn", color: gray },
     ],
   },
   {
@@ -162,11 +165,11 @@ export const PROFILE_TEMPLATES: ProfileTemplateOption[] = [
     label: "Lawyer",
     description: "Billable hours, client cases, meetings all day.",
     roles: [
-      { monogram: "C", name: "Cases", color: "#7C3AED" },
-      { monogram: "A", name: "Admin", color: "#2563EB" },
-      { monogram: "D", name: "Development", color: "#0D9488" },
-      { monogram: "P", name: "Personal", color: "#D97706" },
-      { monogram: "H", name: "Health", color: "#6B7280" },
+      { monogram: "C", name: "Cases", color: violet },
+      { monogram: "A", name: "Admin", color: blue },
+      { monogram: "D", name: "Development", color: teal },
+      { monogram: "P", name: "Personal", color: amber },
+      { monogram: "H", name: "Health", color: gray },
     ],
   },
   {
@@ -174,11 +177,11 @@ export const PROFILE_TEMPLATES: ProfileTemplateOption[] = [
     label: "Consultant",
     description: "Multiple clients, deliverables, deadlines.",
     roles: [
-      { monogram: "C1", name: "Client A", color: "#7C3AED" },
-      { monogram: "C2", name: "Client B", color: "#2563EB" },
-      { monogram: "S", name: "Sales", color: "#0D9488" },
-      { monogram: "D", name: "Delivery", color: "#D97706" },
-      { monogram: "P", name: "Personal", color: "#6B7280" },
+      { monogram: "C1", name: "Client A", color: violet },
+      { monogram: "C2", name: "Client B", color: blue },
+      { monogram: "S", name: "Sales", color: teal },
+      { monogram: "D", name: "Delivery", color: amber },
+      { monogram: "P", name: "Personal", color: gray },
     ],
   },
   {
@@ -186,11 +189,11 @@ export const PROFILE_TEMPLATES: ProfileTemplateOption[] = [
     label: "Manager",
     description: "A team, meetings, and strategic work.",
     roles: [
-      { monogram: "T", name: "Team", color: "#7C3AED" },
-      { monogram: "S", name: "Strategy", color: "#2563EB" },
-      { monogram: "O", name: "Operations", color: "#0D9488" },
-      { monogram: "P", name: "Partner", color: "#D97706" },
-      { monogram: "H", name: "Health", color: "#6B7280" },
+      { monogram: "T", name: "Team", color: violet },
+      { monogram: "S", name: "Strategy", color: blue },
+      { monogram: "O", name: "Operations", color: teal },
+      { monogram: "P", name: "Partner", color: amber },
+      { monogram: "H", name: "Health", color: gray },
     ],
   },
   {
@@ -198,11 +201,11 @@ export const PROFILE_TEMPLATES: ProfileTemplateOption[] = [
     label: "Student",
     description: "Study, work, side projects, learning.",
     roles: [
-      { monogram: "S", name: "Study", color: "#7C3AED" },
-      { monogram: "W", name: "Work", color: "#2563EB" },
-      { monogram: "P", name: "Projects", color: "#0D9488" },
-      { monogram: "F", name: "Fitness", color: "#D97706" },
-      { monogram: "L", name: "Life", color: "#6B7280" },
+      { monogram: "S", name: "Study", color: violet },
+      { monogram: "W", name: "Work", color: blue },
+      { monogram: "P", name: "Projects", color: teal },
+      { monogram: "F", name: "Fitness", color: amber },
+      { monogram: "L", name: "Life", color: gray },
     ],
   },
   {

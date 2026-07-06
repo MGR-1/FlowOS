@@ -8,9 +8,11 @@ import {
   TextInput,
   StyleSheet,
   ScrollView,
+  Pressable,
 } from "react-native";
 import { router } from "expo-router";
 import { colors, spacing, typography, Button } from "@flowos/ui-shared";
+import { useWizard } from "./WizardContext";
 
 const MAX_CHARS = 180;
 
@@ -22,6 +24,7 @@ const MISSION_PROMPTS = [
 ];
 
 export default function MissionEditorScreen() {
+  const { updateWizardState } = useWizard();
   const [mission, setMission] = useState("");
 
   const charCount = mission.trim().length;
@@ -30,6 +33,7 @@ export default function MissionEditorScreen() {
   function handleContinue() {
     if (!isValid) return;
     // TODO: store to missions table via Supabase
+    updateWizardState({ mission: mission.trim() });
     console.log("Mission set:", mission.trim());
     router.push("/onboarding/first-week-goal");
   }
@@ -74,14 +78,16 @@ export default function MissionEditorScreen() {
         <Text style={styles.promptLabel}>Not sure? Start with one of these:</Text>
         <View style={styles.prompts}>
           {MISSION_PROMPTS.map((prompt) => (
-            <View key={prompt} style={styles.promptChip}>
-              <Text
-                style={styles.promptText}
-                onPress={() => handlePrompt(prompt)}
-              >
-                {prompt}
-              </Text>
-            </View>
+            <Pressable
+              key={prompt}
+              onPress={() => handlePrompt(prompt)}
+              style={({ pressed }) => [
+                styles.promptChip,
+                pressed && styles.promptChipPressed,
+              ]}
+            >
+              <Text style={styles.promptText}>{prompt}</Text>
+            </Pressable>
           ))}
         </View>
       </View>
@@ -163,6 +169,9 @@ const styles = StyleSheet.create({
     padding: spacing.sm,
     borderWidth: 1,
     borderColor: colors.border.default,
+  },
+  promptChipPressed: {
+    borderColor: colors.accent.primary,
   },
   promptText: {
     color: colors.text.secondary,

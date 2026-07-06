@@ -8,6 +8,7 @@ import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import { router } from "expo-router";
 import { colors, spacing, typography, RingCard, Button } from "@flowos/ui-shared";
 import { URGENCY_QUESTIONS, scoreUrgencyIndex, type UrgencyProfile } from "@flowos/core";
+import { useWizard } from "./WizardContext";
 
 const SCORE_OPTIONS = [
   { label: "Never", value: 0 },
@@ -22,6 +23,7 @@ const URGENCY_ACCENT: Record<UrgencyProfile, string> = {
 };
 
 export default function UrgencyIndexScreen() {
+  const { updateWizardState } = useWizard();
   const [currentQ, setCurrentQ] = useState(0);
   const [scores, setScores] = useState<number[]>([]);
   const [result, setResult] = useState<ReturnType<typeof scoreUrgencyIndex> | null>(null);
@@ -38,8 +40,14 @@ export default function UrgencyIndexScreen() {
       setScores(newScores);
       setResult(res);
       // TODO: store all 16 scores + total + profile to urgency_index_assessments
+      updateWizardState({ urgencyResult: res });
       console.log("Urgency Index result:", res);
     }
+  }
+
+  function handleBack() {
+    setScores((prev) => prev.slice(0, -1));
+    setCurrentQ((q) => Math.max(0, q - 1));
   }
 
   function handleSkip() {
@@ -84,7 +92,14 @@ export default function UrgencyIndexScreen() {
       <View style={styles.content}>
         <View style={styles.header}>
           <View style={styles.headerTop}>
-            <Text style={styles.stepLabel}>Step 9 of 9 · Optional</Text>
+            <View style={styles.headerLeft}>
+              {currentQ > 0 && (
+                <Pressable onPress={handleBack} hitSlop={8}>
+                  <Text style={styles.backText}>Back</Text>
+                </Pressable>
+              )}
+              <Text style={styles.stepLabel}>Step 9 of 9 · Optional</Text>
+            </View>
             <Pressable onPress={handleSkip}>
               <Text style={styles.skipText}>Skip</Text>
             </Pressable>
@@ -148,6 +163,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+  },
+  backText: {
+    color: colors.accent.primary,
+    fontSize: typography.size.sm,
+    fontWeight: typography.weight.medium as any,
   },
   stepLabel: {
     color: colors.text.muted,

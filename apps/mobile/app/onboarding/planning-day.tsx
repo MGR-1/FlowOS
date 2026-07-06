@@ -11,16 +11,19 @@ import {
   DEFAULT_PLANNING_DAY,
   type PlanningDay,
 } from "@flowos/core";
+import { useWizard } from "./WizardContext";
 
 const DAY_ORDER: PlanningDay[] = [1, 2, 3, 4, 5, 6, 0]; // Mon–Sun
 
 export default function PlanningDayScreen() {
+  const { updateWizardState } = useWizard();
   const [selected, setSelected] = useState<PlanningDay>(DEFAULT_PLANNING_DAY);
 
   function handleContinue() {
     // TODO: store to users.planning_day via Supabase
+    updateWizardState({ planningDay: selected });
     console.log("Planning day selected:", PLANNING_DAY_LABELS[selected]);
-    router.push("/onboarding/urgency-index");
+    router.push("/onboarding/import");
   }
 
   return (
@@ -63,9 +66,7 @@ export default function PlanningDayScreen() {
         <Text style={styles.confirmText}>
           Every{" "}
           <Text style={styles.confirmHighlight}>
-            {Object.entries(PLANNING_DAY_LABELS).find(
-              ([k]) => Number(k) === selected
-            )?.[1] ?? "Friday"}
+            {PLANNING_DAY_LABELS[selected]}
           </Text>
           , FlowOS will prompt your weekly reflection and generate your
           Performance Report.

@@ -12,17 +12,17 @@ import {
   Pressable,
 } from "react-native";
 import { router } from "expo-router";
-import { colors, spacing, typography, Button } from "@flowos/ui-shared";
+import { colors, spacing, typography, Button, withAlpha } from "@flowos/ui-shared";
+import { PROFILE_TEMPLATES } from "@flowos/core";
+import { useWizard } from "./WizardContext";
 
-// Placeholder roles — in production these come from the profile template selection
-const PLACEHOLDER_ROLES = [
-  { monogram: "B", name: "Build", color: "#7C3AED" },
-  { monogram: "G", name: "Grow", color: "#2563EB" },
-  { monogram: "P", name: "Partner", color: "#0D9488" },
-  { monogram: "H", name: "Health", color: "#D97706" },
-];
+// Fallback roles — used if the user reaches this step without the wizard state
+// having a profile-template selection (e.g. deep-linked directly to this screen).
+const FOUNDER_ROLES = PROFILE_TEMPLATES.find((t) => t.value === "founder")?.roles ?? [];
 
 export default function FirstWeekGoalScreen() {
+  const { wizardState, updateWizardState } = useWizard();
+  const roles = wizardState.roles.length > 0 ? wizardState.roles : FOUNDER_ROLES;
   const [selectedRole, setSelectedRole] = useState<number | null>(null);
   const [goal, setGoal] = useState("");
 
@@ -31,8 +31,11 @@ export default function FirstWeekGoalScreen() {
   function handleContinue() {
     if (!isValid) return;
     // TODO: store first week goal + role to goals table via Supabase
+    updateWizardState({
+      firstWeekGoal: { roleIndex: selectedRole, text: goal.trim() },
+    });
     console.log("First week goal:", {
-      role: PLACEHOLDER_ROLES[selectedRole!].name,
+      role: roles[selectedRole!].name,
       goal: goal.trim(),
     });
     router.push("/onboarding/calendar-connection");
@@ -52,7 +55,7 @@ export default function FirstWeekGoalScreen() {
       <View style={styles.section}>
         <Text style={styles.sectionLabel}>Which role does this belong to?</Text>
         <View style={styles.roleRow}>
-          {PLACEHOLDER_ROLES.map((role, i) => (
+          {roles.map((role, i) => (
             <Pressable
               key={role.monogram}
               onPress={() => setSelectedRole(i)}
@@ -60,7 +63,7 @@ export default function FirstWeekGoalScreen() {
                 styles.roleButton,
                 selectedRole === i && {
                   borderColor: role.color,
-                  backgroundColor: role.color + "22",
+                  backgroundColor: withAlpha(role.color, "22"),
                 },
               ]}
             >
