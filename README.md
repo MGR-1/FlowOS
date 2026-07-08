@@ -47,6 +47,15 @@ pnpm --filter desktop tauri dev
 
 ### Supabase (local)
 
+**Requires Docker Desktop to be running** before executing any Supabase commands. Download at [docker.com/products/docker-desktop](https://www.docker.com/products/docker-desktop). 
+
+
+```bash
+supabase start
+supabase db reset
+```
+
+Once started, Supabase Studio is available at `http://localhost:54323`. 
 ```bash
 supabase start
 supabase db reset
