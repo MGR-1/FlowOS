@@ -17,6 +17,14 @@ export const colors = {
     success: "#3DD68C",
     warning: "#F5A623",
     danger: "#E5484D",
+    purple: "#9B59B6",
+  },
+  role: {
+    violet: "#7C3AED",
+    blue: "#2563EB",
+    teal: "#0D9488",
+    amber: "#D97706",
+    gray: "#6B7280",
   },
   border: {
     default: "#2A2A34",
