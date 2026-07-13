@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { ScrollView, View, Text, StyleSheet, Pressable } from "react-native";
 import { router } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { colors, spacing, typography, Button, withAlpha } from "@flowos/ui-shared";
 import {
   PROFILE_TEMPLATES,
@@ -12,6 +13,7 @@ import {
 import { useWizard } from "./WizardContext";
 
 export default function ProfileTemplateScreen() {
+  const { t } = useTranslation();
   const { updateWizardState } = useWizard();
   const [selected, setSelected] = useState<ProfileTemplate | null>(null);
 
@@ -27,12 +29,9 @@ export default function ProfileTemplateScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.header}>
-        <Text style={styles.stepLabel}>Step 2 of 9</Text>
-        <Text style={styles.heading}>What best describes you?</Text>
-        <Text style={styles.subheading}>
-          FlowOS will pre-populate your workspace with roles and routines that
-          fit your context. You can change everything after setup.
-        </Text>
+        <Text style={styles.stepLabel}>{t("onboarding.profileTemplate.stepLabel")}</Text>
+        <Text style={styles.heading}>{t("onboarding.profileTemplate.heading")}</Text>
+        <Text style={styles.subheading}>{t("onboarding.profileTemplate.subheading")}</Text>
       </View>
 
       <View style={styles.templates}>
@@ -53,13 +52,15 @@ export default function ProfileTemplateScreen() {
                   selected === template.value && styles.cardLabelSelected,
                 ]}
               >
-                {template.label}
+                {t(`onboarding.profileTemplate.templates.${template.value}.label`)}
               </Text>
               {selected === template.value && (
                 <View style={styles.checkDot} />
               )}
             </View>
-            <Text style={styles.cardDesc}>{template.description}</Text>
+            <Text style={styles.cardDesc}>
+              {t(`onboarding.profileTemplate.templates.${template.value}.description`)}
+            </Text>
             {template.roles.length > 0 && (
               <View style={styles.roleRow}>
                 {template.roles.map((role) => (
@@ -84,12 +85,12 @@ export default function ProfileTemplateScreen() {
       </View>
 
       <Button
-        label="Continue"
+        label={t("onboarding.profileTemplate.continueCta")}
         onPress={handleContinue}
         variant={selected ? "primary" : "secondary"}
       />
       {!selected && (
-        <Text style={styles.hint}>Select a template to continue</Text>
+        <Text style={styles.hint}>{t("onboarding.profileTemplate.hint")}</Text>
       )}
     </ScrollView>
   );

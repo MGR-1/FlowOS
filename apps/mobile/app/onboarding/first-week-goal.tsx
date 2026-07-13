@@ -12,15 +12,18 @@ import {
   Pressable,
 } from "react-native";
 import { router } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { colors, spacing, typography, Button, withAlpha } from "@flowos/ui-shared";
 import { PROFILE_TEMPLATES } from "@flowos/core";
 import { useWizard } from "./WizardContext";
 
 // Fallback roles — used if the user reaches this step without the wizard state
 // having a profile-template selection (e.g. deep-linked directly to this screen).
-const FOUNDER_ROLES = PROFILE_TEMPLATES.find((t) => t.value === "founder")?.roles ?? [];
+const FOUNDER_ROLES =
+  PROFILE_TEMPLATES.find((tmpl) => tmpl.value === "founder")?.roles ?? [];
 
 export default function FirstWeekGoalScreen() {
+  const { t } = useTranslation();
   const { wizardState, updateWizardState } = useWizard();
   const roles = wizardState.roles.length > 0 ? wizardState.roles : FOUNDER_ROLES;
   const [selectedRole, setSelectedRole] = useState<number | null>(null);
@@ -44,16 +47,15 @@ export default function FirstWeekGoalScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.header}>
-        <Text style={styles.stepLabel}>Step 5 of 9</Text>
-        <Text style={styles.heading}>Your first week goal</Text>
-        <Text style={styles.subheading}>
-          What's the one result you want to achieve this week? Pick the role
-          it belongs to, then name the outcome.
-        </Text>
+        <Text style={styles.stepLabel}>{t("onboarding.firstWeekGoal.stepLabel")}</Text>
+        <Text style={styles.heading}>{t("onboarding.firstWeekGoal.heading")}</Text>
+        <Text style={styles.subheading}>{t("onboarding.firstWeekGoal.subheading")}</Text>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionLabel}>Which role does this belong to?</Text>
+        <Text style={styles.sectionLabel}>
+          {t("onboarding.firstWeekGoal.roleSectionLabel")}
+        </Text>
         <View style={styles.roleRow}>
           {roles.map((role, i) => (
             <Pressable
@@ -89,26 +91,26 @@ export default function FirstWeekGoalScreen() {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionLabel}>What does winning this week look like?</Text>
+        <Text style={styles.sectionLabel}>
+          {t("onboarding.firstWeekGoal.goalSectionLabel")}
+        </Text>
         <TextInput
           style={styles.input}
           value={goal}
           onChangeText={setGoal}
-          placeholder="e.g. Have the first draft of the investor deck done."
+          placeholder={t("onboarding.firstWeekGoal.placeholder")}
           placeholderTextColor={colors.text.muted}
           multiline
         />
       </View>
 
       <Button
-        label="Set goal"
+        label={t("onboarding.firstWeekGoal.cta")}
         onPress={handleContinue}
         variant={isValid ? "primary" : "secondary"}
       />
       {!isValid && (
-        <Text style={styles.hint}>
-          Select a role and describe your goal to continue
-        </Text>
+        <Text style={styles.hint}>{t("onboarding.firstWeekGoal.hint")}</Text>
       )}
     </ScrollView>
   );

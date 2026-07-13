@@ -1,6 +1,7 @@
 // packages/core/src/models/onboarding.ts
 // Source of truth: FlowOS Onboarding Wizard Spec v1.0
 import { colors } from "@flowos/ui-shared";
+import type { ChaosAnswers } from "./chaosMode";
 
 const { violet, blue, teal, amber, gray } = colors.role;
 
@@ -324,6 +325,7 @@ export interface WizardState {
   firstWeekGoal: { roleIndex: number | null; text: string };
   planningDay: PlanningDay;
   urgencyResult: UrgencyResult | null;
+  chaosAnswers: ChaosAnswers | null;
 }
 
 export const INITIAL_WIZARD_STATE: WizardState = {
@@ -335,4 +337,5 @@ export const INITIAL_WIZARD_STATE: WizardState = {
   firstWeekGoal: { roleIndex: null, text: "" },
   planningDay: DEFAULT_PLANNING_DAY,
   urgencyResult: null,
+  chaosAnswers: null,
 };

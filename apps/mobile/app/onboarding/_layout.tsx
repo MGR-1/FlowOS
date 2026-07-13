@@ -17,6 +17,8 @@ export default function OnboardingLayout() {
         <Stack.Screen name="index" options={{ title: "Welcome", headerShown: false }} />
         <Stack.Screen name="profile-template" options={{ title: "Your Profile" }} />
         <Stack.Screen name="chronotype" options={{ title: "Chronotype" }} />
+        <Stack.Screen name="chaos-questions" options={{ title: "Chaos-mode" }} />
+        <Stack.Screen name="chaos-build" options={{ title: "Chaos-mode", headerShown: false }} />
         <Stack.Screen name="mission-editor" options={{ title: "Your Mission" }} />
         <Stack.Screen name="first-week-goal" options={{ title: "First Week Goal" }} />
         <Stack.Screen name="calendar-connection" options={{ title: "Calendar" }} />

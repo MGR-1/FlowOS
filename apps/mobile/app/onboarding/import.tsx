@@ -12,11 +12,13 @@ import {
   Pressable,
 } from "react-native";
 import { router } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { colors, spacing, typography, Button, Badge, OptionCard } from "@flowos/ui-shared";
 
 type ImportMode = "paste" | "manual" | null;
 
 export default function ImportScreen() {
+  const { t } = useTranslation();
   const [mode, setMode] = useState<ImportMode>(null);
   const [pasteText, setPasteText] = useState("");
   const [manualTasks, setManualTasks] = useState<string[]>([""]);
@@ -56,27 +58,23 @@ export default function ImportScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.header}>
-        <Text style={styles.stepLabel}>Step 8 of 9</Text>
-        <Text style={styles.heading}>Bring in your existing tasks</Text>
-        <Text style={styles.subheading}>
-          Already have a list somewhere? Paste it in or add items manually.
-          FlowOS will process them into your Braindump inbox. You can skip this
-          and add tasks later.
-        </Text>
+        <Text style={styles.stepLabel}>{t("onboarding.import.stepLabel")}</Text>
+        <Text style={styles.heading}>{t("onboarding.import.heading")}</Text>
+        <Text style={styles.subheading}>{t("onboarding.import.subheading")}</Text>
       </View>
 
       {/* Mode selector */}
       <View style={styles.modeRow}>
         <View style={styles.modeCard}>
           <OptionCard
-            label="Paste from Notion"
+            label={t("onboarding.import.pasteOption")}
             selected={mode === "paste"}
             onPress={() => setMode("paste")}
           />
         </View>
         <View style={styles.modeCard}>
           <OptionCard
-            label="Type manually"
+            label={t("onboarding.import.manualOption")}
             selected={mode === "manual"}
             onPress={() => setMode("manual")}
           />
@@ -86,21 +84,21 @@ export default function ImportScreen() {
       {/* Paste mode */}
       {mode === "paste" && (
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>
-            Copy your task list and paste it below. One task per line.
-          </Text>
+          <Text style={styles.sectionLabel}>{t("onboarding.import.pasteLabel")}</Text>
           <TextInput
             style={styles.pasteInput}
             value={pasteText}
             onChangeText={setPasteText}
-            placeholder={"Task 1\nTask 2\nTask 3"}
+            placeholder={t("onboarding.import.pastePlaceholder")}
             placeholderTextColor={colors.text.muted}
             multiline
             autoFocus
           />
           {pasteText.trim().length > 0 && (
             <Badge
-              label={`${pasteText.split("\n").filter((l) => l.trim()).length} tasks detected`}
+              label={t("onboarding.import.tasksDetected", {
+                count: pasteText.split("\n").filter((l) => l.trim()).length,
+              })}
               tone="success"
             />
           )}
@@ -110,31 +108,35 @@ export default function ImportScreen() {
       {/* Manual mode */}
       {mode === "manual" && (
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Add one task per line.</Text>
+          <Text style={styles.sectionLabel}>{t("onboarding.import.manualLabel")}</Text>
           {manualTasks.map((task, i) => (
             <TextInput
               key={i}
               style={styles.taskInput}
               value={task}
               onChangeText={(val) => handleTaskChange(i, val)}
-              placeholder={`Task ${i + 1}`}
+              placeholder={t("onboarding.import.taskPlaceholder", { n: i + 1 })}
               placeholderTextColor={colors.text.muted}
               autoFocus={i === manualTasks.length - 1}
             />
           ))}
           <Pressable onPress={handleAddTask} style={styles.addButton}>
-            <Text style={styles.addButtonText}>+ Add another task</Text>
+            <Text style={styles.addButtonText}>{t("onboarding.import.addTaskCta")}</Text>
           </Pressable>
         </View>
       )}
 
       <Button
-        label={mode ? "Import and continue" : "Continue"}
+        label={
+          mode
+            ? t("onboarding.import.continueCta")
+            : t("onboarding.import.continueDefaultCta")
+        }
         onPress={handleContinue}
         variant="primary"
       />
       <Pressable onPress={handleSkip} style={styles.skipButton}>
-        <Text style={styles.skipText}>Skip — I'll add tasks later</Text>
+        <Text style={styles.skipText}>{t("onboarding.import.skipCta")}</Text>
       </Pressable>
     </ScrollView>
   );

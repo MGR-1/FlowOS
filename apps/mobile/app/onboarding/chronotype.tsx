@@ -5,6 +5,7 @@
 import { useState } from "react";
 import { ScrollView, View, Text, StyleSheet, Pressable } from "react-native";
 import { router } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { colors, spacing, typography, RingCard, Button } from "@flowos/ui-shared";
 import {
   CHRONOTYPE_QUESTIONS,
@@ -22,7 +23,8 @@ const CHRONOTYPE_ACCENT: Record<ChronotypeName, string> = {
 };
 
 export default function ChronotypeScreen() {
-  const { updateWizardState } = useWizard();
+  const { t } = useTranslation();
+  const { wizardState, updateWizardState } = useWizard();
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<ChronotypeName[]>([]);
   const [result, setResult] = useState<ChronotypeName | null>(null);
@@ -46,7 +48,12 @@ export default function ChronotypeScreen() {
   }
 
   function handleContinue() {
-    router.push("/onboarding/mission-editor");
+    // Chaos-mode replaces steps 4/5/8 with a single 5-question flow (spec §5)
+    if (wizardState.profileTemplate === "chaos") {
+      router.push("/onboarding/chaos-questions");
+    } else {
+      router.push("/onboarding/mission-editor");
+    }
   }
 
   function handleBack() {
@@ -56,20 +63,19 @@ export default function ChronotypeScreen() {
 
   // Result card
   if (result) {
-    const profile = CHRONOTYPE_PROFILES[result];
     const accent = CHRONOTYPE_ACCENT[result];
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-        <Text style={styles.stepLabel}>Step 3 of 9</Text>
-        <Text style={styles.heading}>Your chronotype</Text>
+        <Text style={styles.stepLabel}>{t("onboarding.chronotype.stepLabel")}</Text>
+        <Text style={styles.heading}>{t("onboarding.chronotype.resultHeading")}</Text>
         <RingCard
-          title={profile.label}
-          subtitle={profile.peakWindow}
-          description={profile.description}
-          tip="FlowOS will use this to schedule your Investment Blocks in your peak window from day one."
+          title={t(`onboarding.chronotype.profiles.${result}.label`)}
+          subtitle={CHRONOTYPE_PROFILES[result].peakWindow}
+          description={t(`onboarding.chronotype.profiles.${result}.description`)}
+          tip={t("onboarding.chronotype.resultTip")}
           accentColor={accent}
         />
-        <Button label="Continue" onPress={handleContinue} />
+        <Button label={t("onboarding.chronotype.continueCta")} onPress={handleContinue} />
       </ScrollView>
     );
   }
@@ -83,10 +89,10 @@ export default function ChronotypeScreen() {
           <View style={styles.headerLeft}>
             {currentQ > 0 && (
               <Pressable onPress={handleBack} hitSlop={8}>
-                <Text style={styles.backText}>Back</Text>
+                <Text style={styles.backText}>{t("onboarding.chronotype.backCta")}</Text>
               </Pressable>
             )}
-            <Text style={styles.stepLabel}>Step 3 of 9</Text>
+            <Text style={styles.stepLabel}>{t("onboarding.chronotype.stepLabel")}</Text>
           </View>
           <Text style={styles.progressText}>
             {currentQ + 1} of {total}
@@ -101,8 +107,10 @@ export default function ChronotypeScreen() {
           />
         </View>
 
-        <Text style={styles.heading}>When do you do your best work?</Text>
-        <Text style={styles.questionText}>{question.text}</Text>
+        <Text style={styles.heading}>{t("onboarding.chronotype.heading")}</Text>
+        <Text style={styles.questionText}>
+          {t(`onboarding.chronotype.questions.${question.id}.text`)}
+        </Text>
 
         <View style={styles.options}>
           {question.options.map((opt) => (
@@ -114,14 +122,14 @@ export default function ChronotypeScreen() {
                 pressed && styles.optionButtonPressed,
               ]}
             >
-              <Text style={styles.optionLabel}>{opt.label}</Text>
+              <Text style={styles.optionLabel}>
+                {t(`onboarding.chronotype.questions.${question.id}.options.${opt.value}`)}
+              </Text>
             </Pressable>
           ))}
         </View>
 
-        <Text style={styles.hint}>
-          Tap an answer to continue — answering advances automatically.
-        </Text>
+        <Text style={styles.hint}>{t("onboarding.chronotype.hint")}</Text>
       </View>
     </View>
   );

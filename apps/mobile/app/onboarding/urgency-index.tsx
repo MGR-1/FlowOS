@@ -6,14 +6,15 @@
 import { useState } from "react";
 import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import { router } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { colors, spacing, typography, RingCard, Button } from "@flowos/ui-shared";
 import { URGENCY_QUESTIONS, scoreUrgencyIndex, type UrgencyProfile } from "@flowos/core";
 import { useWizard } from "./WizardContext";
 
-const SCORE_OPTIONS = [
-  { label: "Never", value: 0 },
-  { label: "Sometimes", value: 2 },
-  { label: "Always", value: 4 },
+const SCORE_VALUES = [
+  { key: "never", value: 0 },
+  { key: "sometimes", value: 2 },
+  { key: "always", value: 4 },
 ];
 
 const URGENCY_ACCENT: Record<UrgencyProfile, string> = {
@@ -23,6 +24,7 @@ const URGENCY_ACCENT: Record<UrgencyProfile, string> = {
 };
 
 export default function UrgencyIndexScreen() {
+  const { t } = useTranslation();
   const { updateWizardState } = useWizard();
   const [currentQ, setCurrentQ] = useState(0);
   const [scores, setScores] = useState<number[]>([]);
@@ -66,22 +68,22 @@ export default function UrgencyIndexScreen() {
     const accent = URGENCY_ACCENT[result.profile];
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-        <Text style={styles.stepLabel}>Step 9 of 9</Text>
-        <Text style={styles.heading}>Your urgency profile</Text>
+        <Text style={styles.stepLabel}>{t("onboarding.urgencyIndex.stepLabel")}</Text>
+        <Text style={styles.heading}>{t("onboarding.urgencyIndex.heading")}</Text>
         <View style={styles.scoreRow}>
-          <Text style={styles.scoreLabel}>Total score</Text>
+          <Text style={styles.scoreLabel}>{t("onboarding.urgencyIndex.scoreLabel")}</Text>
           <Text style={[styles.scoreValue, { color: accent }]}>
             {result.totalScore} / 64
           </Text>
         </View>
         <RingCard
-          title={result.profileLabel}
-          subtitle={`Score: ${result.totalScore}`}
-          description={result.description}
-          tip="You can retake this anytime in Settings → Performance → Urgency Profile."
+          title={t(`onboarding.urgencyIndex.profiles.${result.profile}.label`)}
+          subtitle={`${t("onboarding.urgencyIndex.scoreLabel")}: ${result.totalScore}`}
+          description={t(`onboarding.urgencyIndex.profiles.${result.profile}.description`)}
+          tip={t("onboarding.urgencyIndex.resultTip")}
           accentColor={accent}
         />
-        <Button label="Finish setup" onPress={handleFinish} />
+        <Button label={t("onboarding.urgencyIndex.finishCta")} onPress={handleFinish} />
       </ScrollView>
     );
   }
@@ -95,13 +97,15 @@ export default function UrgencyIndexScreen() {
             <View style={styles.headerLeft}>
               {currentQ > 0 && (
                 <Pressable onPress={handleBack} hitSlop={8}>
-                  <Text style={styles.backText}>Back</Text>
+                  <Text style={styles.backText}>{t("onboarding.urgencyIndex.backCta")}</Text>
                 </Pressable>
               )}
-              <Text style={styles.stepLabel}>Step 9 of 9 · Optional</Text>
+              <Text style={styles.stepLabel}>
+                {t("onboarding.urgencyIndex.stepLabelOptional")}
+              </Text>
             </View>
             <Pressable onPress={handleSkip}>
-              <Text style={styles.skipText}>Skip</Text>
+              <Text style={styles.skipText}>{t("onboarding.urgencyIndex.skipCta")}</Text>
             </Pressable>
           </View>
           <Text style={styles.progressText}>
@@ -118,13 +122,13 @@ export default function UrgencyIndexScreen() {
           />
         </View>
 
-        <Text style={styles.heading}>Your urgency profile</Text>
+        <Text style={styles.heading}>{t("onboarding.urgencyIndex.heading")}</Text>
         <Text style={styles.questionText}>
-          {URGENCY_QUESTIONS[currentQ]}
+          {t(`onboarding.urgencyIndex.questions.q${currentQ + 1}`)}
         </Text>
 
         <View style={styles.options}>
-          {SCORE_OPTIONS.map((opt) => (
+          {SCORE_VALUES.map((opt) => (
             <Pressable
               key={opt.value}
               onPress={() => handleAnswer(opt.value)}
@@ -133,14 +137,14 @@ export default function UrgencyIndexScreen() {
                 pressed && styles.optionButtonPressed,
               ]}
             >
-              <Text style={styles.optionLabel}>{opt.label}</Text>
+              <Text style={styles.optionLabel}>
+                {t(`onboarding.urgencyIndex.options.${opt.key}`)}
+              </Text>
             </Pressable>
           ))}
         </View>
 
-        <Text style={styles.hint}>
-          Tap an answer to advance — based on Covey's First Things First.
-        </Text>
+        <Text style={styles.hint}>{t("onboarding.urgencyIndex.hint")}</Text>
       </View>
     </View>
   );

@@ -3,9 +3,17 @@
 
 import { View, Text, StyleSheet } from "react-native";
 import { router } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { colors, spacing, typography, Button } from "@flowos/ui-shared";
 
 export default function WelcomeScreen() {
+  const { t } = useTranslation();
+  const bullets = [
+    t("onboarding.welcome.bullet1"),
+    t("onboarding.welcome.bullet2"),
+    t("onboarding.welcome.bullet3"),
+  ];
+
   return (
     <View style={styles.container}>
       <View style={styles.logoArea}>
@@ -14,17 +22,10 @@ export default function WelcomeScreen() {
         </View>
       </View>
       <View style={styles.body}>
-        <Text style={styles.heading}>Welcome to FlowOS</Text>
-        <Text style={styles.subheading}>
-          Your personal operating system for elite performance. Takes about 3
-          minutes to set up. Everything can be changed later.
-        </Text>
+        <Text style={styles.heading}>{t("onboarding.welcome.heading")}</Text>
+        <Text style={styles.subheading}>{t("onboarding.welcome.subheading")}</Text>
         <View style={styles.bullets}>
-          {[
-            "Plan your week in under 5 minutes",
-            "Know your Most Important Task every morning",
-            "Close every day with a clean shutdown",
-          ].map((line) => (
+          {bullets.map((line) => (
             <View key={line} style={styles.bulletRow}>
               <View style={styles.bulletDot} />
               <Text style={styles.bulletText}>{line}</Text>
@@ -33,7 +34,7 @@ export default function WelcomeScreen() {
         </View>
       </View>
       <Button
-        label="Let's build your workspace"
+        label={t("onboarding.welcome.cta")}
         onPress={() => router.push("/onboarding/profile-template")}
       />
     </View>
