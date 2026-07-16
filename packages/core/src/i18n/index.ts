@@ -25,6 +25,11 @@ if (!i18next.isInitialized) {
     fallbackLng: "en",
     interpolation: { escapeValue: false },
     react: { useSuspense: false },
+    // Hermes on Android does not ship Intl.PluralRules by default, which
+    // i18next needs for its v4 plural resolver. v3 pluralization doesn't
+    // depend on Intl, so it avoids the runtime warning/error without
+    // requiring an Intl polyfill dependency.
+    compatibilityJSON: "v3",
   });
 }
 

@@ -326,6 +326,9 @@ export interface WizardState {
   planningDay: PlanningDay;
   urgencyResult: UrgencyResult | null;
   chaosAnswers: ChaosAnswers | null;
+  // Set once the user reaches the "You're set up" screen (spec §6). Used to
+  // stop resume-on-relaunch from replaying a finished wizard.
+  completedAt: string | null;
 }
 
 export const INITIAL_WIZARD_STATE: WizardState = {
@@ -338,4 +341,5 @@ export const INITIAL_WIZARD_STATE: WizardState = {
   planningDay: DEFAULT_PLANNING_DAY,
   urgencyResult: null,
   chaosAnswers: null,
+  completedAt: null,
 };

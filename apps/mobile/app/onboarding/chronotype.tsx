@@ -13,7 +13,7 @@ import {
   detectChronotype,
   type ChronotypeName,
 } from "@flowos/core";
-import { useWizard } from "./WizardContext";
+import { useWizard } from "./_WizardContext";
 
 const CHRONOTYPE_ACCENT: Record<ChronotypeName, string> = {
   lion: colors.accent.warning,

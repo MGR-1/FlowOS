@@ -12,7 +12,7 @@ import {
   DEFAULT_PLANNING_DAY,
   type PlanningDay,
 } from "@flowos/core";
-import { useWizard } from "./WizardContext";
+import { useWizard } from "./_WizardContext";
 
 const DAY_ORDER: PlanningDay[] = [1, 2, 3, 4, 5, 6, 0]; // Mon–Sun
 

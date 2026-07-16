@@ -316,6 +316,12 @@ export const en = {
         high: "Fully automate my day",
       },
     },
+    complete: {
+      heading: "You're set up.",
+      subheading:
+        "Your first day is ready. More features will show up as you use FlowOS — no need to configure everything today.",
+      primaryCta: "Take me to Today",
+    },
   },
 } as const;
 
@@ -629,6 +635,12 @@ export const nl = {
         low: "Geef me gewoon de basis",
         high: "Automatiseer mijn dag volledig",
       },
+    },
+    complete: {
+      heading: "Je bent klaar om te starten.",
+      subheading:
+        "Je eerste dag staat klaar. Meer functies verschijnen naarmate je FlowOS gebruikt — je hoeft vandaag niet alles in te stellen.",
+      primaryCta: "Naar Vandaag",
     },
   },
 } as const;

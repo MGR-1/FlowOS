@@ -1,7 +1,7 @@
 // apps/mobile/app/onboarding/_layout.tsx
 import { Stack } from "expo-router";
 import { colors } from "@flowos/ui-shared";
-import { WizardProvider } from "./WizardContext";
+import { WizardProvider } from "./_WizardContext";
 
 export default function OnboardingLayout() {
   return (
@@ -25,6 +25,7 @@ export default function OnboardingLayout() {
         <Stack.Screen name="planning-day" options={{ title: "Planning Day" }} />
         <Stack.Screen name="import" options={{ title: "Import Tasks" }} />
         <Stack.Screen name="urgency-index" options={{ title: "Urgency Profile" }} />
+        <Stack.Screen name="complete" options={{ title: "All set", headerShown: false }} />
       </Stack>
     </WizardProvider>
   );

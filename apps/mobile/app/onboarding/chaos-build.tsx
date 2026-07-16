@@ -13,7 +13,7 @@ import {
   INITIAL_CHAOS_ANSWERS,
   type ChaosGeneratedWorkspace,
 } from "@flowos/core";
-import { useWizard } from "./WizardContext";
+import { useWizard } from "./_WizardContext";
 
 export default function ChaosBuildScreen() {
   const { t } = useTranslation();

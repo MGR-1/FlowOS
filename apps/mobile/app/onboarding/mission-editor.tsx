@@ -13,7 +13,7 @@ import {
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { colors, spacing, typography, Button } from "@flowos/ui-shared";
-import { useWizard } from "./WizardContext";
+import { useWizard } from "./_WizardContext";
 
 const MAX_CHARS = 180;
 

@@ -10,7 +10,7 @@ import {
   PROFILE_TEMPLATES,
   type ProfileTemplate,
 } from "@flowos/core";
-import { useWizard } from "./WizardContext";
+import { useWizard } from "./_WizardContext";
 
 export default function ProfileTemplateScreen() {
   const { t } = useTranslation();
