@@ -1,4 +1,4 @@
-// apps/mobile/app/onboarding/_WizardContext.tsx
+// apps/mobile/context/WizardContext.tsx
 // Shared in-memory state across the 9 onboarding steps, so a selection made in
 // an earlier step (e.g. profile template roles) is available in later steps
 // (e.g. first-week-goal) instead of being lost between screens.

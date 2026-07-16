@@ -23,7 +23,7 @@ import {
   type ChaosAreaKey,
   type ChaosFrictionKey,
 } from "@flowos/core";
-import { useWizard } from "./_WizardContext";
+import { useWizard } from "../../context/WizardContext";
 
 const STRUCTURE_LEVELS = [1, 2, 3, 4, 5];
 

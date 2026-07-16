@@ -9,7 +9,7 @@ import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { colors, spacing, typography, RingCard, Button } from "@flowos/ui-shared";
 import { URGENCY_QUESTIONS, scoreUrgencyIndex, type UrgencyProfile } from "@flowos/core";
-import { useWizard } from "./_WizardContext";
+import { useWizard } from "../../context/WizardContext";
 
 const SCORE_VALUES = [
   { key: "never", value: 0 },

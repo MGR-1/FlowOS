@@ -10,7 +10,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { colors, spacing, typography, Button } from "@flowos/ui-shared";
-import { useWizard } from "./_WizardContext";
+import { useWizard } from "../../context/WizardContext";
 
 export default function OnboardingCompleteScreen() {
   const { t } = useTranslation();

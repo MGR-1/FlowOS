@@ -15,7 +15,7 @@ import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { colors, spacing, typography, Button, withAlpha } from "@flowos/ui-shared";
 import { PROFILE_TEMPLATES } from "@flowos/core";
-import { useWizard } from "./_WizardContext";
+import { useWizard } from "../../context/WizardContext";
 
 // Fallback roles — used if the user reaches this step without the wizard state
 // having a profile-template selection (e.g. deep-linked directly to this screen).

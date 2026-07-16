@@ -1,7 +1,7 @@
 // apps/mobile/app/onboarding/_layout.tsx
 import { Stack } from "expo-router";
 import { colors } from "@flowos/ui-shared";
-import { WizardProvider } from "./_WizardContext";
+import { WizardProvider } from "../../context/WizardContext";
 
 export default function OnboardingLayout() {
   return (
