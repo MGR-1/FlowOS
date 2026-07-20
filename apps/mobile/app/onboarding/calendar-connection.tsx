@@ -4,31 +4,16 @@
 import { useState } from "react";
 import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import { router } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { colors, spacing, typography, Button, Badge } from "@flowos/ui-shared";
 
 type CalendarProvider = "google" | "microsoft";
 type ConnectionStatus = "idle" | "connecting" | "connected" | "error";
 
-interface CalendarOption {
-  provider: CalendarProvider;
-  label: string;
-  sublabel: string;
-}
-
-const CALENDAR_OPTIONS: CalendarOption[] = [
-  {
-    provider: "google",
-    label: "Google Calendar",
-    sublabel: "Gmail, Google Workspace",
-  },
-  {
-    provider: "microsoft",
-    label: "Microsoft / Outlook",
-    sublabel: "Outlook, Microsoft 365",
-  },
-];
+const CALENDAR_PROVIDERS: CalendarProvider[] = ["google", "microsoft"];
 
 export default function CalendarConnectionScreen() {
+  const { t } = useTranslation();
   const [status, setStatus] = useState<
     Record<CalendarProvider, ConnectionStatus>
   >({
@@ -60,30 +45,33 @@ export default function CalendarConnectionScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.header}>
-        <Text style={styles.stepLabel}>Step 6 of 9</Text>
-        <Text style={styles.heading}>Connect your calendar</Text>
+        <Text style={styles.stepLabel}>{t("onboarding.calendarConnection.stepLabel")}</Text>
+        <Text style={styles.heading}>{t("onboarding.calendarConnection.heading")}</Text>
         <Text style={styles.subheading}>
-          FlowOS reads your events to build an accurate day plan — meetings
-          block time automatically. You can connect later in Settings.
+          {t("onboarding.calendarConnection.subheading")}
         </Text>
       </View>
 
       <View style={styles.options}>
-        {CALENDAR_OPTIONS.map((option) => {
-          const s = status[option.provider];
+        {CALENDAR_PROVIDERS.map((provider) => {
+          const s = status[provider];
           const isConnected = s === "connected";
           const isConnecting = s === "connecting";
           return (
-            <View key={option.provider} style={styles.optionCard}>
+            <View key={provider} style={styles.optionCard}>
               <View style={styles.optionInfo}>
-                <Text style={styles.optionLabel}>{option.label}</Text>
-                <Text style={styles.optionSublabel}>{option.sublabel}</Text>
+                <Text style={styles.optionLabel}>
+                  {t(`onboarding.calendarConnection.providers.${provider}.label`)}
+                </Text>
+                <Text style={styles.optionSublabel}>
+                  {t(`onboarding.calendarConnection.providers.${provider}.sublabel`)}
+                </Text>
               </View>
               {isConnected ? (
-                <Badge label="Connected" tone="success" />
+                <Badge label={t("onboarding.calendarConnection.connectedBadge")} tone="success" />
               ) : (
                 <Pressable
-                  onPress={() => handleConnect(option.provider)}
+                  onPress={() => handleConnect(provider)}
                   disabled={isConnecting}
                   style={[
                     styles.connectButton,
@@ -91,7 +79,9 @@ export default function CalendarConnectionScreen() {
                   ]}
                 >
                   <Text style={styles.connectButtonText}>
-                    {isConnecting ? "Connecting…" : "Connect"}
+                    {isConnecting
+                      ? t("onboarding.calendarConnection.connectingCta")
+                      : t("onboarding.calendarConnection.connectCta")}
                   </Text>
                 </Pressable>
               )}
@@ -102,18 +92,21 @@ export default function CalendarConnectionScreen() {
 
       <View style={styles.permissionNote}>
         <Text style={styles.permissionText}>
-          FlowOS requests read-only access to event titles, times, and
-          attendees. It never reads email content or contacts.
+          {t("onboarding.calendarConnection.permissionNote")}
         </Text>
       </View>
 
       {anyConnected ? (
-        <Button label="Continue" onPress={handleContinue} />
+        <Button label={t("onboarding.calendarConnection.continueCta")} onPress={handleContinue} />
       ) : (
         <>
-          <Button label="Continue" onPress={handleContinue} variant="secondary" />
+          <Button
+            label={t("onboarding.calendarConnection.continueCta")}
+            onPress={handleContinue}
+            variant="secondary"
+          />
           <Pressable onPress={handleSkip} style={styles.skipButton}>
-            <Text style={styles.skipText}>Skip for now — connect later</Text>
+            <Text style={styles.skipText}>{t("onboarding.calendarConnection.skipCta")}</Text>
           </Pressable>
         </>
       )}

@@ -11,19 +11,17 @@ import {
   Pressable,
 } from "react-native";
 import { router } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { colors, spacing, typography, Button } from "@flowos/ui-shared";
-import { useWizard } from "./WizardContext";
+import { useWizard } from "../../context/WizardContext";
 
 const MAX_CHARS = 180;
 
-const MISSION_PROMPTS = [
-  "Build a firm that survives without me.",
-  "Reach the partnership track without burning out.",
-  "Ship something people pay for before July.",
-  "Be present for my family and still grow the business.",
-];
-
 export default function MissionEditorScreen() {
+  const { t } = useTranslation();
+  const missionPrompts = t("onboarding.missionEditor.prompts", {
+    returnObjects: true,
+  }) as string[];
   const { updateWizardState } = useWizard();
   const [mission, setMission] = useState("");
 
@@ -45,12 +43,9 @@ export default function MissionEditorScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.header}>
-        <Text style={styles.stepLabel}>Step 4 of 9</Text>
-        <Text style={styles.heading}>What are you building?</Text>
-        <Text style={styles.subheading}>
-          Write your mission in one sentence. This appears at the top of every
-          week — it's your filter for what matters and what doesn't.
-        </Text>
+        <Text style={styles.stepLabel}>{t("onboarding.missionEditor.stepLabel")}</Text>
+        <Text style={styles.heading}>{t("onboarding.missionEditor.heading")}</Text>
+        <Text style={styles.subheading}>{t("onboarding.missionEditor.subheading")}</Text>
       </View>
 
       <View style={styles.inputArea}>
@@ -58,7 +53,7 @@ export default function MissionEditorScreen() {
           style={styles.input}
           value={mission}
           onChangeText={setMission}
-          placeholder="e.g. Build a firm that survives without me."
+          placeholder={t("onboarding.missionEditor.placeholder")}
           placeholderTextColor={colors.text.muted}
           multiline
           maxLength={MAX_CHARS}
@@ -75,9 +70,9 @@ export default function MissionEditorScreen() {
       </View>
 
       <View style={styles.promptSection}>
-        <Text style={styles.promptLabel}>Not sure? Start with one of these:</Text>
+        <Text style={styles.promptLabel}>{t("onboarding.missionEditor.promptLabel")}</Text>
         <View style={styles.prompts}>
-          {MISSION_PROMPTS.map((prompt) => (
+          {missionPrompts.map((prompt) => (
             <Pressable
               key={prompt}
               onPress={() => handlePrompt(prompt)}
@@ -93,7 +88,7 @@ export default function MissionEditorScreen() {
       </View>
 
       <Button
-        label="Set my mission"
+        label={t("onboarding.missionEditor.cta")}
         onPress={handleContinue}
         variant={isValid ? "primary" : "secondary"}
       />

@@ -5,37 +5,40 @@
 import { useState } from "react";
 import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import { router } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { colors, spacing, typography, Button } from "@flowos/ui-shared";
 import {
   PLANNING_DAY_LABELS,
   DEFAULT_PLANNING_DAY,
   type PlanningDay,
 } from "@flowos/core";
-import { useWizard } from "./WizardContext";
+import { useWizard } from "../../context/WizardContext";
 
 const DAY_ORDER: PlanningDay[] = [1, 2, 3, 4, 5, 6, 0]; // Mon–Sun
 
 export default function PlanningDayScreen() {
-  const { updateWizardState } = useWizard();
+  const { t } = useTranslation();
+  const { wizardState, updateWizardState } = useWizard();
   const [selected, setSelected] = useState<PlanningDay>(DEFAULT_PLANNING_DAY);
 
   function handleContinue() {
     // TODO: store to users.planning_day via Supabase
     updateWizardState({ planningDay: selected });
     console.log("Planning day selected:", PLANNING_DAY_LABELS[selected]);
-    router.push("/onboarding/import");
+    // Chaos-mode skips Import (step 8) — modified step order per spec §5
+    if (wizardState.profileTemplate === "chaos") {
+      router.push("/onboarding/urgency-index");
+    } else {
+      router.push("/onboarding/import");
+    }
   }
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.header}>
-        <Text style={styles.stepLabel}>Step 7 of 9</Text>
-        <Text style={styles.heading}>Your planning day</Text>
-        <Text style={styles.subheading}>
-          FlowOS will prompt your weekly review and generate your Performance
-          Report on this day. Friday is the default — most people plan the
-          new week before the weekend.
-        </Text>
+        <Text style={styles.stepLabel}>{t("onboarding.planningDay.stepLabel")}</Text>
+        <Text style={styles.heading}>{t("onboarding.planningDay.heading")}</Text>
+        <Text style={styles.subheading}>{t("onboarding.planningDay.subheading")}</Text>
       </View>
 
       {/* Horizontal day selector */}
@@ -55,7 +58,7 @@ export default function PlanningDayScreen() {
                 selected === day && styles.dayLabelSelected,
               ]}
             >
-              {PLANNING_DAY_LABELS[day]}
+              {t(`onboarding.planningDay.days.${day}`)}
             </Text>
           </Pressable>
         ))}
@@ -64,16 +67,15 @@ export default function PlanningDayScreen() {
       {/* Live confirmation sentence */}
       <View style={styles.confirmBox}>
         <Text style={styles.confirmText}>
-          Every{" "}
+          {t("onboarding.planningDay.confirmPrefix")}{" "}
           <Text style={styles.confirmHighlight}>
-            {PLANNING_DAY_LABELS[selected]}
+            {t(`onboarding.planningDay.days.${selected}`)}
           </Text>
-          , FlowOS will prompt your weekly reflection and generate your
-          Performance Report.
+          {t("onboarding.planningDay.confirmSuffix")}
         </Text>
       </View>
 
-      <Button label="Confirm" onPress={handleContinue} />
+      <Button label={t("onboarding.planningDay.cta")} onPress={handleContinue} />
     </ScrollView>
   );
 }
