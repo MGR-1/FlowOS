@@ -11,3 +11,4 @@ ios/
 android/
 target/
 package-lock.json
+graphify-out/
