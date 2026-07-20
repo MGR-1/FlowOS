@@ -1,18 +1,30 @@
 // apps/mobile/app/onboarding/index.tsx
 // Step 1 of 9 — Welcome screen
 
+import { useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { colors, spacing, typography, Button } from "@flowos/ui-shared";
+import { useWizard } from "../../context/WizardContext";
 
 export default function WelcomeScreen() {
   const { t } = useTranslation();
+  const { hydrated, resumeRoute } = useWizard();
   const bullets = [
     t("onboarding.welcome.bullet1"),
     t("onboarding.welcome.bullet2"),
     t("onboarding.welcome.bullet3"),
   ];
+
+  // Resume-on-relaunch (spec §2, "Exit behaviour"): if AsyncStorage has an
+  // incomplete wizard in progress, skip straight back to that step instead
+  // of restarting from Welcome.
+  useEffect(() => {
+    if (hydrated && resumeRoute) {
+      router.replace(resumeRoute as any);
+    }
+  }, [hydrated, resumeRoute]);
 
   return (
     <View style={styles.container}>

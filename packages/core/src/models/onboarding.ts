@@ -248,11 +248,25 @@ export type UrgencyProfile =
   | "urgency_mindset"
   | "urgency_addiction";
 
+// The live urgency_index_assessments.profile_type CHECK constraint
+// (supabase/migrations/20260703022100_addendum_new_tables.sql) only accepts
+// these 4 values — it does not have "urgency_mindset" / "urgency_addiction"
+// as DB-legal values, unlike the 3-tier UrgencyProfile used for on-screen
+// copy above. The two source spec documents disagree here; the DB is the
+// ground truth for what can actually be written.
+export type DbUrgencyProfileType =
+  | "prioritizer"
+  | "procrastinator"
+  | "yes_man"
+  | "slacker";
+
 export interface UrgencyResult {
   totalScore: number;
   profile: UrgencyProfile;
   profileLabel: string;
   description: string;
+  // Value to write to urgency_index_assessments.profile_type — see note above.
+  dbProfileType: DbUrgencyProfileType;
 }
 
 // Exact 16 questions from spec (Covey First Things First)
@@ -274,6 +288,24 @@ export const URGENCY_QUESTIONS: string[] = [
   "I complete tasks quickly but not always well.",
   "I lose track of what I said I would do this week.",
 ];
+
+// Maps a scored assessment to the DB's 4-value profile_type. Prioritizer
+// (total <= 25) maps directly. Above that threshold, the Addendum spec
+// defines secondary labels by which specific question scored highest:
+// Procrastinator (Q1), Yes-Man (Q3), Slacker (Q4) — those are the only
+// other values the DB accepts, so one of the three is always picked, with
+// ties broken in that same order (Q1 > Q3 > Q4).
+function mapToDbProfileType(total: number, scores: number[]): DbUrgencyProfileType {
+  if (total <= 25) return "prioritizer";
+
+  const q1 = scores[0] ?? 0; // procrastinator signal
+  const q3 = scores[2] ?? 0; // yes-man signal
+  const q4 = scores[3] ?? 0; // slacker signal
+
+  if (q1 >= q3 && q1 >= q4) return "procrastinator";
+  if (q3 >= q4) return "yes_man";
+  return "slacker";
+}
 
 // Score ranges from spec
 export function scoreUrgencyIndex(scores: number[]): UrgencyResult {
@@ -311,6 +343,7 @@ export function scoreUrgencyIndex(scores: number[]): UrgencyResult {
     totalScore: total,
     profile,
     ...profileData[profile],
+    dbProfileType: mapToDbProfileType(total, scores),
   };
 }
 
@@ -326,6 +359,9 @@ export interface WizardState {
   planningDay: PlanningDay;
   urgencyResult: UrgencyResult | null;
   chaosAnswers: ChaosAnswers | null;
+  // Set once the user reaches the "You're set up" screen (spec §6). Used to
+  // stop resume-on-relaunch from replaying a finished wizard.
+  completedAt: string | null;
 }
 
 export const INITIAL_WIZARD_STATE: WizardState = {
@@ -338,4 +374,5 @@ export const INITIAL_WIZARD_STATE: WizardState = {
   planningDay: DEFAULT_PLANNING_DAY,
   urgencyResult: null,
   chaosAnswers: null,
+  completedAt: null,
 };

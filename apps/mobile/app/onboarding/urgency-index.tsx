@@ -9,7 +9,7 @@ import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { colors, spacing, typography, RingCard, Button } from "@flowos/ui-shared";
 import { URGENCY_QUESTIONS, scoreUrgencyIndex, type UrgencyProfile } from "@flowos/core";
-import { useWizard } from "./WizardContext";
+import { useWizard } from "../../context/WizardContext";
 
 const SCORE_VALUES = [
   { key: "never", value: 0 },
@@ -55,12 +55,12 @@ export default function UrgencyIndexScreen() {
   function handleSkip() {
     // Skippable — nudge shown on Day 3 morning protocol per spec
     console.log("Urgency Index skipped at onboarding");
-    router.replace("/");
+    router.replace("/onboarding/complete");
   }
 
   function handleFinish() {
     // TODO: mark onboarding complete in Supabase
-    router.replace("/");
+    router.replace("/onboarding/complete");
   }
 
   // Result card

@@ -12,6 +12,7 @@
   "dependencies": {
     "@flowos/core": "workspace:*",
     "@flowos/ui-shared": "workspace:*",
+    "@react-native-async-storage/async-storage": "2.2.0",
     "expo": "~54.0.0",
     "expo-router": "~6.0.0",
     "i18next": "^23.11.5",
