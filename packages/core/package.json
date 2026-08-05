@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@flowos/ui-shared": "workspace:*",
+    "@supabase/supabase-js": "^2.112.0",
     "i18next": "^23.11.5",
     "react-i18next": "^14.1.2"
   },
