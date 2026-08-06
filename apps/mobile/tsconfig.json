@@ -1,4 +1,10 @@
 {
-  "compilerOptions": {},
-  "extends": "expo/tsconfig.base"
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    // expo/tsconfig.base leaves strict off, which disables narrowing of
+    // discriminated unions — `if (!result.ok)` would not narrow @flowos/core's
+    // Result type, so error handling could not be typechecked. The existing
+    // screens were already strict-clean, so turning it on costs nothing.
+    "strict": true
+  }
 }

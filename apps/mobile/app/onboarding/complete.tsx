@@ -9,20 +9,41 @@ import { useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { colors, spacing, typography, Button } from "@flowos/ui-shared";
+import { syncOnboarding } from "@flowos/core";
 import { useWizard } from "../../context/WizardContext";
+import { useAuth, PENDING_SYNC_KEY } from "../../context/AuthContext";
 
 export default function OnboardingCompleteScreen() {
   const { t } = useTranslation();
-  const { updateWizardState, clearProgress } = useWizard();
+  const { userId } = useAuth();
+  const { wizardState, updateWizardState, clearProgress } = useWizard();
 
   useEffect(() => {
-    // Mark complete so resume-on-relaunch stops offering to resume, and drop
-    // the persisted in-progress record now that the wizard is finished.
+    // Mark complete so resume-on-relaunch stops offering to resume.
     updateWizardState({ completedAt: new Date().toISOString() });
-    clearProgress();
+
+    if (!userId) return;
+
+    // Fire and forget — the user is never blocked on the network here. Their
+    // answers are already in AsyncStorage, so a failure stays recoverable and
+    // AuthProvider replays it on the next launch (design spec §5.2).
+    syncOnboarding(userId, wizardState).then((result) => {
+      if (result.ok) {
+        // Only drop the local record once it is safely persisted; the retry
+        // needs this state to have something to send.
+        clearProgress();
+      } else {
+        console.warn(
+          "[onboarding] sync failed, will retry on next launch:",
+          result.error
+        );
+        AsyncStorage.setItem(PENDING_SYNC_KEY, "1").catch(() => {});
+      }
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [userId]);
 
   function handleContinue() {
     // "Today" screen doesn't exist as a real destination yet — timeline.tsx

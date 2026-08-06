@@ -41,9 +41,9 @@ export default function ChronotypeScreen() {
       const detected = detectChronotype(newAnswers);
       setAnswers(newAnswers);
       setResult(detected);
-      // TODO: store to chronotype_profiles.assessed_type via Supabase
+      // Held in wizard state here; written to chronotype_profiles by the
+      // batch sync on the completion screen.
       updateWizardState({ chronotype: detected });
-      console.log("Chronotype assessed:", detected);
     }
   }
 
