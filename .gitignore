@@ -1,6 +1,14 @@
 node_modules/
-dist/
 .env.local
 .env
-*.local
+dist/
+build/
+.expo/
+.turbo/
+*.log
 .DS_Store
+ios/
+android/
+target/
+package-lock.json
+graphify-out/
