@@ -9,7 +9,7 @@ import {
   type CompletedFocusSession,
   type FocusDuration,
   type RhythmState,
-} from './engine'
+} from '../../../packages/core/src/performance/focusRhythm'
 
 const STATE_KEY = 'flowos.focusRhythm.state.v1'
 const HISTORY_KEY = 'flowos.focusRhythm.history.v1'
