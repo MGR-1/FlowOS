@@ -83,25 +83,54 @@ export async function syncOnboarding(
     }
 
     // --- roles + goals -----------------------------------------------------
-    // roles has no unique constraint either, so clear this user's rows before
-    // inserting. The goal references a role id returned by that insert.
+    // roles has no unique constraint, so a blind insert would duplicate on a
+    // retry. Deleting first is not an option either: goals.role_id references
+    // roles with no ON DELETE rule, so the delete raises a foreign-key
+    // violation once a goal exists — and tasks and time_blocks will reference
+    // roles too. So: seed roles only when the user has none. Onboarding
+    // creates the initial set; a retry finds them and moves on.
     const roleRows = buildRoleRows(userId, state);
+    let roleIds: string[] = [];
+
     if (roleRows.length > 0) {
-      const cleared = await db.from("roles").delete().eq("user_id", userId);
-      if (cleared.error) return err(cleared.error.message);
+      const existing = await db
+        .from("roles")
+        .select("id")
+        .eq("user_id", userId)
+        .order("order_index");
+      if (existing.error) return err(existing.error.message);
 
-      const inserted = await db.from("roles").insert(roleRows).select("id");
-      if (inserted.error) return err(inserted.error.message);
+      const existingIds = (existing.data ?? []) as { id: string }[];
 
-      const insertedIds = (inserted.data ?? []) as { id: string }[];
-      const roleIndex = state.firstWeekGoal.roleIndex;
-      const roleId =
-        roleIndex !== null && insertedIds[roleIndex]
-          ? insertedIds[roleIndex].id
-          : null;
+      if (existingIds.length > 0) {
+        roleIds = existingIds.map((r) => r.id);
+      } else {
+        const inserted = await db.from("roles").insert(roleRows).select("id");
+        if (inserted.error) return err(inserted.error.message);
+        roleIds = ((inserted.data ?? []) as { id: string }[]).map((r) => r.id);
+      }
+    }
 
-      const goalRow = buildGoalRow(userId, state, roleId, isoWeek);
-      if (goalRow) {
+    // --- goals -------------------------------------------------------------
+    // Same reasoning: one first-week goal per user per ISO week. Check before
+    // inserting so a retry does not stack duplicates.
+    const roleIndex = state.firstWeekGoal.roleIndex;
+    const roleId =
+      roleIndex !== null && roleIds[roleIndex] ? roleIds[roleIndex] : null;
+
+    const goalRow = buildGoalRow(userId, state, roleId, isoWeek);
+    if (goalRow) {
+      const existingGoal = await db
+        .from("goals")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("timeframe", "week")
+        .eq("week_number", isoWeek.week)
+        .eq("year", isoWeek.year)
+        .maybeSingle();
+      if (existingGoal.error) return err(existingGoal.error.message);
+
+      if (!existingGoal.data) {
         const goal = await db.from("goals").insert(goalRow);
         if (goal.error) return err(goal.error.message);
       }

@@ -85,7 +85,7 @@ beforeEach(() => {
 describe("syncOnboarding", () => {
   it("writes to every table for a fully completed wizard", async () => {
     queued["roles"] = [
-      EMPTY, // delete
+      EMPTY, // select existing -> none
       { data: [{ id: "role-1" }, { id: "role-2" }], error: null }, // insert
     ];
 
@@ -115,18 +115,38 @@ describe("syncOnboarding", () => {
     expect(calls["chronotype_profiles"]).not.toContain("insert");
   });
 
-  it("deletes existing roles before inserting, so a retry cannot duplicate them", async () => {
+  it("inserts roles when the user has none yet", async () => {
     queued["roles"] = [
-      EMPTY,
-      { data: [{ id: "role-1" }, { id: "role-2" }], error: null },
+      EMPTY, // select existing -> none
+      { data: [{ id: "role-1" }, { id: "role-2" }], error: null }, // insert
     ];
 
     await syncOnboarding("user-1", fullState, NOW);
 
-    const roleCalls = calls["roles"];
-    expect(roleCalls).toContain("delete");
-    expect(roleCalls).toContain("insert");
-    expect(roleCalls.indexOf("delete")).toBeLessThan(roleCalls.indexOf("insert"));
+    expect(calls["roles"]).toContain("insert");
+  });
+
+  // Deleting roles first is not an option: goals.role_id references roles with
+  // no ON DELETE rule, so a delete raises a foreign-key violation once a goal
+  // exists. Re-seeding would also destroy roles that tasks reference.
+  it("never deletes roles, and skips the insert when the user already has some", async () => {
+    queued["roles"] = [
+      { data: [{ id: "role-1" }, { id: "role-2" }], error: null }, // select existing
+    ];
+
+    await syncOnboarding("user-1", fullState, NOW);
+
+    expect(calls["roles"]).not.toContain("delete");
+    expect(calls["roles"]).not.toContain("insert");
+  });
+
+  it("does not insert a second goal for a week that already has one", async () => {
+    queued["roles"] = [{ data: [{ id: "role-1" }], error: null }];
+    queued["goals"] = [{ data: { id: "goal-1" }, error: null }]; // already exists
+
+    await syncOnboarding("user-1", fullState, NOW);
+
+    expect(calls["goals"]).not.toContain("insert");
   });
 
   it("always updates user_profiles rather than inserting, since the signup trigger creates it", async () => {
@@ -147,6 +167,7 @@ describe("syncOnboarding", () => {
 
   it("skips goals when the first-week goal is blank", async () => {
     queued["roles"] = [EMPTY, { data: [{ id: "role-1" }], error: null }];
+    queued["goals"] = [EMPTY];
 
     await syncOnboarding(
       "user-1",
