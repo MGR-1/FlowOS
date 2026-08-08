@@ -10,6 +10,12 @@ This document covers the approval-independent performance features implemented o
 - Morning Protocol Sequencer
 - Investment Score calculation
 - Daily, weekly, and monthly reflections
+- Recovery Log
+- Configurable Homepage Widgets
+- Dictation settings and Mac overlay state
+- Mac Soft Distraction Shield
+- Cursor Glow interaction contract
+- Minimalist Mode for Mac
 
 The implementation is intentionally frontend-agnostic. Product UI lives in a separate repository and should consume the exported domain functions from `@flowos/core`.
 
@@ -73,6 +79,32 @@ Invalid or negative intervals are ignored. Results include the rounded score, to
 
 AI summaries are stored as optional output. Generating them is deliberately separate from reflection capture so the core flow works without external AI credentials.
 
+### Recovery Log
+
+`performance/recoveryLog.ts` validates the three required 30-second inputs: sleep hours, alcohol last night, and movement today. Optional wearable readiness can be attached. Correlation features remain disabled until 14 unique days are present.
+
+### Configurable Homepage Widgets
+
+`homepage/widgets.ts` defines all 10 approved widget types, default visibility, sizes, deterministic ordering, toggles, drag-and-drop reorder semantics, and layout validation. Natural-language layout interpretation remains an optional AI adapter; it is not required for manual configuration.
+
+### Dictation Settings and Mac Overlay
+
+`dictation/dictation.ts` defines the two-toggle hierarchy, Small/Medium/Large-v3 model selection, the fixed Option+Space shortcut, 10 dictation contexts, and overlay states from listening through insertion-ready output. Search always uses raw transcription. Dictation history is capped at 20 sessions, remains local-only, and supports a three-second clear undo window.
+
+The native audio capture, whisper.cpp runtime, waveform, teal-ring rendering, Accessibility API insertion, and global WebviewWindow belong in the Mac frontend/native repository.
+
+### Mac Soft Distraction Shield
+
+`mac/distractionShield.ts` implements 30-second observation, a nudge after 10 consecutive minutes away from expected applications, dismiss, 10-minute snooze, intentional drift, break pausing, and stop/reset behavior. A platform adapter contract isolates NSWorkspace from the business rules.
+
+### Cursor Glow
+
+`ui/cursorGlow.ts` fixes the interaction tokens: #1D9E75 at 4% opacity, approved radii by surface, and the specified focus/leave transitions. It exposes CSS variables for the frontend hook. The actual pseudo-element and requestAnimationFrame listener belong in the frontend repository.
+
+### Minimalist Mode
+
+`mac/minimalistMode.ts` defines Cmd+Shift+M toggling, Escape exit, active-task/timer state, and a Mac adapter contract. The consuming frontend must hide all navigation and render only the task title and timer.
+
 ## Database Migration
 
 Migration `20260808170000_performance_core.sql` adds:
@@ -82,6 +114,10 @@ Migration `20260808170000_performance_core.sql` adds:
 - `nsdr_sessions`
 - `tracked_intervals`
 - `reflection_entries`
+- `recovery_logs`
+- `homepage_layouts`
+- `dictation_preferences`
+- `mac_experience_settings`
 
 Every table uses row-level security with `user_id = auth.uid()`. The migration is additive and does not remove or rename existing columns or tables. Existing legacy reflection and morning-protocol tables remain untouched.
 
@@ -96,6 +132,11 @@ Import features from `@flowos/core` and keep display/state adapters in the front
 - request platform notification or focus permissions only in platform adapters;
 - calculate Investment Score from the selected reporting period;
 - submit reflection answers only after `validateReflection()` returns no errors.
+- store dictation history and active-app observations locally only;
+- connect NSWorkspace through `MacActiveApplicationAdapter`;
+- implement Cursor Glow with requestAnimationFrame rather than CSS keyframes;
+- render the approved Homepage Widget layout without changing widget identity;
+- connect Minimalist Mode to Cmd+Shift+M and Escape in the Mac shell.
 
 ## Verification
 
