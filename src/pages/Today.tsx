@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTasks, useTimeBlocks, useTodayReadiness, useMission, useBraindump } from '../hooks/useFlowOS'
 import { HeroRing, SatelliteRings } from '../components/Rings'
+import { FocusRhythmCard } from '../features/focusRhythm/FocusRhythmCard'
 import { colors, font, radius, spacing, blockTypeColor } from '../lib/tokens'
 import type { Task, TimeBlock } from '../types'
 
@@ -99,6 +100,8 @@ export function Today() {
           </div>
         )}
       </div>
+
+      <FocusRhythmCard />
 
       {/* Main content grid */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.lg }}>
