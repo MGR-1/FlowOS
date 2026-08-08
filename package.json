@@ -7,12 +7,25 @@
   },
   "packageManager": "pnpm@11.9.0",
   "scripts": {
-    "build": "pnpm -r build",
+    "build": "vite build && pnpm -r --if-present build",
+    "dev": "vite",
     "dev:mobile": "pnpm --filter mobile start",
     "dev:desktop": "pnpm --filter desktop tauri dev",
-    "test": "pnpm -r test"
+    "test": "vitest run && pnpm -r test"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "react": "19.1.0",
+    "react-dom": "^19.1.0",
+    "react-router-dom": "^6.26.0"
   },
   "devDependencies": {
-    "supabase": "^2.109.0"
+    "@types/react": "~19.1.10",
+    "@types/react-dom": "^19.1.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "supabase": "^2.109.0",
+    "typescript": "^5.5.3",
+    "vite": "^5.4.0",
+    "vitest": "^3.2.4"
   }
 }
