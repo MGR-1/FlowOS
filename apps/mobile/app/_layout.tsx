@@ -3,11 +3,14 @@ import { Stack } from "expo-router";
 import { colors, spacing, typography } from "@flowos/ui-shared";
 import { I18nextProvider, useTranslation } from "react-i18next";
 import { i18next } from "@flowos/core";
+import { AuthProvider } from "../context/AuthContext";
 
 export default function RootLayout() {
   return (
     <I18nextProvider i18n={i18next}>
-      <RootStack />
+      <AuthProvider>
+        <RootStack />
+      </AuthProvider>
       <DevLocaleToggle />
     </I18nextProvider>
   );
@@ -22,7 +25,10 @@ function RootStack() {
         contentStyle: { backgroundColor: colors.background.primary },
       }}
     >
-      <Stack.Screen name="index" options={{ title: "FlowOS" }} />
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="sign-in" options={{ headerShown: false }} />
+      <Stack.Screen name="dev-menu" options={{ title: "FlowOS" }} />
+      <Stack.Screen name="week-intention" options={{ title: "Week Intention" }} />
     </Stack>
   );
 }

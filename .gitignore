@@ -12,3 +12,5 @@ android/
 target/
 package-lock.json
 graphify-out/
+# test coverage output
+coverage/

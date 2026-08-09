@@ -5,9 +5,13 @@
 //
 // Also persists progress to AsyncStorage so that closing the app mid-wizard
 // resumes from the last completed step on next launch (spec: "Global wizard
-// behaviour — Exit behaviour"). This is purely local/device state — it does
-// NOT touch Supabase, since the onboarding data writes are still blocked on
-// the auth session + DB migrations landing (see packages/core/src/supabase/).
+// behaviour — Exit behaviour").
+//
+// This is local/device state only. The write to Supabase happens once, as a
+// batch, when the user reaches the completion screen — see
+// app/onboarding/complete.tsx and packages/core/src/supabase/onboarding.ts.
+// Keeping the local copy until that write succeeds is what makes the
+// retry-on-next-launch path possible.
 
 import {
   createContext,

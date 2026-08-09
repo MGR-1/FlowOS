@@ -52,6 +52,21 @@ export const CHRONOTYPE_PROFILES: Record<ChronotypeName, ChronotypeProfile> = {
   },
 };
 
+// Machine-readable counterpart to CHRONOTYPE_PROFILES[x].peakWindow, which is
+// display copy ("08:00 – 12:00") and, for dolphin, the unparseable "Variable".
+// These values are written to chronotype_profiles.peak_window_start/_end,
+// which are `time` columns. Dolphin is null — ADR-013 gives dolphins no fixed
+// window and distributes work by detected peaks instead.
+export const PEAK_WINDOWS: Record<
+  ChronotypeName,
+  { start: string; end: string } | null
+> = {
+  lion: { start: "08:00", end: "12:00" },
+  bear: { start: "10:00", end: "14:00" },
+  wolf: { start: "17:00", end: "21:00" },
+  dolphin: null,
+};
+
 // Exact questions + options from spec (Breus methodology)
 export interface ChronotypeOption {
   label: string;
@@ -267,6 +282,10 @@ export interface UrgencyResult {
   description: string;
   // Value to write to urgency_index_assessments.profile_type — see note above.
   dbProfileType: DbUrgencyProfileType;
+  // The 16 raw answers, retained for urgency_index_assessments.q1_score ..
+  // q16_score. US-059 requires every individual score to be stored, not just
+  // the total, so they cannot be discarded after scoring.
+  scores: number[];
 }
 
 // Exact 16 questions from spec (Covey First Things First)
@@ -344,6 +363,7 @@ export function scoreUrgencyIndex(scores: number[]): UrgencyResult {
     profile,
     ...profileData[profile],
     dbProfileType: mapToDbProfileType(total, scores),
+    scores,
   };
 }
 
